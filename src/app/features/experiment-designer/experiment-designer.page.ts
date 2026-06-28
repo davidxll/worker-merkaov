@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ApparatusPreviewComponent } from './components/apparatus-preview.component.js';
 import { ExperimentDesignerService, WIZARD_STEPS } from './experiment-designer.service.js';
 import { WizardStepDirective, WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import { WizardResultComponent } from '../../shared/components/wizard-result.component.js';
 import {
   CONTAINMENT_OPTIONS, EXCITATION_OPTIONS,
   DETECTOR_OPTIONS, OUTPUT_FORMAT_OPTIONS,
@@ -14,7 +15,7 @@ import {
   selector: 'app-experiment-designer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ApparatusPreviewComponent, WizardStepDirective],
+  imports: [CommonModule, ApparatusPreviewComponent, WizardStepDirective, WizardResultComponent],
   providers: [{ provide: WIZARD_STEP_SERVICE, useExisting: ExperimentDesignerService }],
   template: `
     <div class="ed-root">
@@ -388,6 +389,7 @@ import {
       <!-- ══════════════════════════════════════════════
            STICKY BOTTOM NAV
       ══════════════════════════════════════════════ -->
+      @if (!eds.isComplete()) {
       <div class="ed-bottom-bar">
         <div class="bottom-bar-inner">
           <div class="bottom-summary">
@@ -427,65 +429,21 @@ import {
           </div>
         </div>
       </div>
+      }
 
       <!-- ══════════════════════════════════════════════
-           COMPLETION MODAL
+           RESULT STEP
       ══════════════════════════════════════════════ -->
       @if (eds.isComplete()) {
-        <div class="modal-overlay" (click)="eds.reset()">
-          <div class="modal-card" (click)="$event.stopPropagation()">
-            <!-- Schematic at full size -->
-            <div class="modal-schematic">
-              <app-apparatus-preview [config]="eds.config()" [compact]="false" />
-            </div>
-
-            <div class="modal-body">
-              <div class="modal-badge">
-                <i class="fas fa-flask mr-2"></i>EXPERIMENT CONFIGURED
-              </div>
-              <h2 class="modal-title">Configuration Saved</h2>
-              <p class="modal-subtitle">
-                Your krypton experiment is ready for review and submission.
-              </p>
-
-              <div class="modal-summary-grid">
-                <div class="modal-summary-row">
-                  <span class="modal-summary-label">
-                    <i class="fas fa-flask mr-1.5"></i>Containment
-                  </span>
-                  <span class="modal-summary-val">{{ eds.containmentName() }}</span>
-                </div>
-                <div class="modal-summary-row">
-                  <span class="modal-summary-label">
-                    <i class="fas fa-bolt-lightning mr-1.5"></i>Excitation
-                  </span>
-                  <span class="modal-summary-val">{{ eds.excitationName() }}</span>
-                </div>
-                <div class="modal-summary-row">
-                  <span class="modal-summary-label">
-                    <i class="fas fa-satellite-dish mr-1.5"></i>Detector
-                  </span>
-                  <span class="modal-summary-val">{{ eds.detectorName() }}</span>
-                </div>
-                <div class="modal-summary-row">
-                  <span class="modal-summary-label">
-                    <i class="fas fa-file-export mr-1.5"></i>Output
-                  </span>
-                  <span class="modal-summary-val">{{ eds.outputFormatName() }}</span>
-                </div>
-              </div>
-
-              <div class="modal-actions">
-                <button class="btn-reset" (click)="eds.reset()" type="button">
-                  <i class="fas fa-rotate-left mr-1.5"></i>New Configuration
-                </button>
-                <button class="btn-close-modal" (click)="eds.reset()" type="button">
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <app-wizard-result
+          [title]="eds.resultData().title"
+          [description]="eds.resultData().description"
+          [data]="eds.resultData()">
+          <app-apparatus-preview [config]="eds.config()" [compact]="false" />
+          <button resultActions class="btn-reset" (click)="eds.reset()" type="button">
+            <i class="fas fa-rotate-left mr-1.5"></i>New Configuration
+          </button>
+        </app-wizard-result>
       }
     </div>
   `,

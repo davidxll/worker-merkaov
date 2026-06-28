@@ -13,7 +13,7 @@ import { ButtonModule } from 'primeng/button';
       [modal]="true"
       [style]="{ width: '420px' }"
       [draggable]="false"
-      (onHide)="cancel.emit()"
+      (onHide)="dismissed.emit()"
     >
       <div class="flex items-start gap-4 py-2">
         <i [class]="iconClass() + ' text-2xl mt-0.5 shrink-0'"></i>
@@ -48,7 +48,7 @@ export class ConfirmModal {
   visible = false;
 
   confirm = output<void>();
-  cancel  = output<void>();
+  dismissed  = output<void>();
 
   open()  { this.visible = true; }
   close() { this.visible = false; }
@@ -60,6 +60,6 @@ export class ConfirmModal {
 
   onCancel() {
     this.visible = false;
-    this.cancel.emit();
+    this.dismissed.emit();
   }
 }

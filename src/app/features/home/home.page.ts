@@ -103,9 +103,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
           <ng-template #title>Monthly Revenue</ng-template>
           <ng-template #subtitle>Finance &middot; Q2 2026</ng-template>
           <ng-template #content>
-            <p class="text-slate-400 text-sm">Total revenue increased 18% compared to last quarter, driven by enterprise subscriptions.</p>
+            <p class="card-body-text">Total revenue increased 18% compared to last quarter, driven by enterprise subscriptions.</p>
             <div class="mt-4">
-              <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Target</span><span>74%</span></div>
+              <div class="flex justify-between card-caption-text mb-1"><span>Target</span><span>74%</span></div>
               <p-progressbar [value]="74" [showValue]="false" styleClass="h-2"></p-progressbar>
             </div>
           </ng-template>
@@ -123,12 +123,12 @@ ModuleRegistry.registerModules([AllCommunityModule]);
           <ng-template #title>Active Users</ng-template>
           <ng-template #subtitle>Platform &middot; Today</ng-template>
           <ng-template #content>
-            <p class="text-slate-400 text-sm">3,842 users active across web and mobile. Peak hour was 2 PM with 612 concurrent sessions.</p>
+            <p class="card-body-text">3,842 users active across web and mobile. Peak hour was 2 PM with 612 concurrent sessions.</p>
             <div class="flex items-center gap-2 mt-4">
               <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-primary-600 text-white"></p-avatar>
               <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-purple-600 text-white"></p-avatar>
               <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-emerald-600 text-white"></p-avatar>
-              <span class="text-slate-400 text-xs ml-1">+3,839 more</span>
+              <span class="card-caption-text ml-1">+3,839 more</span>
             </div>
           </ng-template>
           <ng-template #footer>
@@ -145,7 +145,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
           <ng-template #title>System Health</ng-template>
           <ng-template #subtitle>Infrastructure &middot; Live</ng-template>
           <ng-template #content>
-            <p class="text-slate-400 text-sm">All services operational. Uptime at 99.97% over the last 30 days.</p>
+            <p class="card-body-text">All services operational. Uptime at 99.97% over the last 30 days.</p>
             <div class="flex gap-2 mt-4 flex-wrap">
               <p-tag value="API" severity="success"></p-tag>
               <p-tag value="DB"  severity="success"></p-tag>
@@ -183,13 +183,13 @@ ModuleRegistry.registerModules([AllCommunityModule]);
           <input pInputText id="input-search" type="text" [(ngModel)]="formSearch" placeholder="Type to search..." class="w-full" />
         </div>
         <div class="form-field">
-          <label class="form-label" for="input-api-key">API Key <span class="text-slate-500 text-xs">(disabled)</span></label>
+          <label class="form-label" for="input-api-key">API Key <span class="field-hint">(disabled)</span></label>
           <input pInputText id="input-api-key" type="text" value="sk-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" [disabled]="true" class="w-full opacity-50" />
         </div>
       </div>
       @if (formName) {
-        <p class="mt-5 text-slate-400 text-sm">
-          Hello, <span class="text-primary-400 font-medium">{{ formName }}</span>! Live binding is working.
+        <p class="mt-5" style="font-size:14px;color:var(--f-text-2);">
+          Hello, <span style="color:var(--f-accent-light);font-weight:500;">{{ formName }}</span>! Live binding is working.
         </p>
       }
     </section>
@@ -221,7 +221,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             <p-chip [label]="chip" [removable]="true" (onRemove)="removeChip(chip)"></p-chip>
           }
           @if (activeChips().length === 0) {
-            <span class="text-slate-500 text-sm italic">All chips removed.</span>
+            <span style="font-size:13px;color:var(--f-text-3);font-style:italic;">All chips removed.</span>
           }
         </div>
       </div>
@@ -265,7 +265,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
       <p-dialog header="Welcome to Waltkerovoz" [(visible)]="dialogBasic"
                 [modal]="true" [draggable]="true" [style]="{ width: '480px' }">
-        <p class="text-slate-300 text-sm leading-relaxed">
+        <p class="dialog-text">
           This is a PrimeNG dialog. It supports rich content, form controls, and custom footers.
           Drag it by the header bar or press Escape to close.
         </p>
@@ -278,8 +278,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       <p-dialog header="Confirm Action" [(visible)]="dialogConfirm"
                 [modal]="true" [style]="{ width: '400px' }">
         <div class="flex items-start gap-4">
-          <i class="fas fa-triangle-exclamation text-yellow-400 text-2xl mt-0.5 shrink-0" aria-hidden="true"></i>
-          <p class="text-slate-300 text-sm leading-relaxed">
+          <i class="fas fa-triangle-exclamation shrink-0" style="color:var(--kr-warning);font-size:22px;margin-top:2px;" aria-hidden="true"></i>
+          <p class="dialog-text">
             This action cannot be undone. Are you sure you want to permanently delete this record?
           </p>
         </div>
@@ -303,7 +303,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         @for (icon of showcaseIcons; track icon.class) {
           <div class="icon-tile">
             <i [class]="icon.class + ' text-2xl text-primary-400'" aria-hidden="true"></i>
-            <span class="text-slate-500 text-xs text-center">{{ icon.label }}</span>
+            <span class="icon-label">{{ icon.label }}</span>
           </div>
         }
       </div>
@@ -368,13 +368,13 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       background: var(--f-layer-0);
       border-bottom: 1px solid var(--f-stroke-sd);
       box-shadow: inset 0 -1px 0 rgba(107,191,160,0.18);
-      i { color: #8ECFA8; }
+      i { color: var(--kr-crystal-light); }
     }
     .card-media--emerald {
       background: var(--f-layer-0);
       border-bottom: 1px solid var(--f-stroke-sd);
       box-shadow: inset 0 -1px 0 rgba(200,148,58,0.18);
-      i { color: #DEB86A; }
+      i { color: var(--kr-corona-light); }
     }
 
     /* ── Icon tiles ── */
@@ -399,11 +399,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     .code-tag {
       font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
       font-size: 12px;
-      background: rgba(58,143,200,0.12);
+      background: var(--kr-primary-ghost);
       color: var(--f-accent-light);
       padding: 2px 6px;
       border-radius: 4px;
-      border: 1px solid rgba(126,200,227,0.20);
+      border: 1px solid var(--f-stroke-sd);
     }
   `],
 })
@@ -458,11 +458,11 @@ export class HomePage {
       field: 'status', headerName: 'Status', flex: 1, sortable: true,
       cellStyle: p => {
         const map: Record<string, string> = {
-          'Active':   '#22c55e',
-          'Inactive': '#94a3b8',
-          'On Leave': '#f59e0b',
+          'Active':   'var(--kr-success)',
+          'Inactive': 'var(--f-text-2)',
+          'On Leave': 'var(--kr-warning)',
         };
-        return { color: map[p.value] ?? '#e2e8f0', fontWeight: '500' };
+        return { color: map[p.value] ?? 'var(--f-text-1)', fontWeight: '500' };
       },
     },
   ];

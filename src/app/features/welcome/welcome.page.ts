@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
       </a>
       <div class="wl-nav-links">
         <a routerLink="/app/home">Showcase</a>
-        <a routerLink="/app/gear-builder">Gear Builder</a>
+        <a routerLink="/app/gear-builder">Object Builder</a>
         <a routerLink="/app/experiment-designer">Experiment Designer</a>
         <a routerLink="/app/element-explorer">Element Explorer</a>
       </div>
@@ -38,7 +38,7 @@ import { RouterLink } from '@angular/router';
 
         <p class="wl-desc">
           Waltkerovoz is a reference-grade Angular 21 PWA — a living PrimeNG component
-          showcase <strong>and</strong> a fully-built vehicle configurator — forged inside
+          showcase <strong>and</strong> a fully-built generic object builder — forged inside
           the <strong>Crystalline Torque</strong> design system. One theme file. Every
           component re-skinned in noble-gas light.
         </p>
@@ -85,18 +85,18 @@ import { RouterLink } from '@angular/router';
       }
     </section>
 
-    <!-- ── Gear Builder showcase ── -->
+    <!-- ── Object Builder showcase ── -->
     <section class="wl-showcase">
       <div class="wl-showcase-eyebrow">
         <span class="wl-eyebrow-dot"></span> THE FLAGSHIP FLOW
       </div>
-      <h2 class="wl-showcase-title">The Gear Builder</h2>
+      <h2 class="wl-showcase-title">The Object Builder</h2>
       <p class="wl-showcase-desc">
-        Configure your machine in three interlocking moves. Every choice renders into a
-        live vector preview — body, glass, rims and corona, assembled in real time.
+        Configure any abstract object in three interlocking moves — Structure, Drive, Finish.
+        Every choice renders into a live geometric schematic, assembled in real time.
       </p>
       <a class="wl-btn-primary wl-showcase-cta" routerLink="/app/gear-builder">
-        Open Gear Builder <i class="fas fa-arrow-right"></i>
+        Open Object Builder <i class="fas fa-arrow-right"></i>
       </a>
     </section>
 
@@ -467,7 +467,7 @@ export class WelcomePage {
   readonly stats = [
     { value: '8',      label: 'Component Families' },
     { value: '2,000+', label: 'FontAwesome Icons'  },
-    { value: '3',      label: 'Step Gear Builder'  },
+    { value: '3',      label: 'Step Object Builder' },
     { value: '1',      label: 'SCSS Theme File'    },
   ];
 

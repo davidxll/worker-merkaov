@@ -1,14 +1,31 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import {
-  CHASSIS_OPTIONS, ENGINE_OPTIONS, COLOR_OPTIONS,
-  RIM_OPTIONS, BODY_KIT_OPTIONS,
+  STRUCTURE_OPTIONS, DRIVE_OPTIONS, FINISH_OPTIONS, DETAIL_OPTIONS, MODULE_OPTIONS,
 } from './gear-builder.mock.js';
 import type {
-  GearBuild, WizardStep,
-  ChassisId, EngineId, ColorId, RimId, BodyKitId,
+  ObjectBuild, StructureId, DriveId, FinishId, DetailId, ModuleId,
 } from './gear-builder.types.js';
+import type { WizardResultData } from '../../shared/wizard-result.types.js';
 
-export type CompareTarget = 'chassis' | 'engine' | 'color' | 'rim';
+// ── Wizard step definitions ──────────────────────────────────────────────────
+
+export interface WizardStep {
+  readonly label:    string;
+  readonly icon:     string;
+  readonly sublabel: string;
+}
+
+export const WIZARD_STEPS: readonly WizardStep[] = [
+  { label: 'Structure', icon: 'fas fa-cube',        sublabel: 'Form type'     },
+  { label: 'Drive',     icon: 'fas fa-bolt',         sublabel: 'Power source'  },
+  { label: 'Finish',    icon: 'fas fa-palette',      sublabel: 'Look & detail' },
+];
+
+// ── Compare ──────────────────────────────────────────────────────────────────
+
+export type CompareTarget = 'structure' | 'drive';
+
+// ── Build chips ──────────────────────────────────────────────────────────────
 
 export interface BuildChip {
   readonly label: string;
@@ -16,44 +33,48 @@ export interface BuildChip {
   readonly value: string | null;
 }
 
-export const WIZARD_STEPS: readonly WizardStep[] = [
-  { label: 'Chassis', icon: 'fas fa-car-side', sublabel: 'Body type'   },
-  { label: 'Engine',  icon: 'fas fa-gears',    sublabel: 'Powertrain'  },
-  { label: 'Styling', icon: 'fas fa-palette',  sublabel: 'Look & feel' },
-];
-
-const EMPTY_BUILD: GearBuild = {
-  chassis: null, engine: null, color: null, rim: null, bodyKit: null,
-};
+// ── Service ──────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
 export class GearBuilderService {
 
-  // ── Raw state ───────────────────────────────────────────────────────────────
+  // ── State ──────────────────────────────────────────────────────────────────
 
-  private readonly stepSig          = signal<number>(1);
-  private readonly buildSig         = signal<GearBuild>(EMPTY_BUILD);
-  private readonly openPanelsSig    = signal<ReadonlySet<string>>(new Set());
-  private readonly compareOpenSig   = signal<boolean>(false);
-  private readonly compareTargetSig = signal<CompareTarget>('chassis');
-  private readonly completeSig      = signal<boolean>(false);
+  public readonly stepSig        = signal<number>(1);
+  public readonly buildSig       = signal<ObjectBuild>({ structure: null, drive: null, finish: null, detail: null, module: null });
+  public readonly openPanelsSig  = signal<Set<string>>(new Set());
+  public readonly compareOpenSig = signal<boolean>(false);
+  public readonly compareTargetSig = signal<CompareTarget>('structure');
 
-  // ── Public read-only signals ────────────────────────────────────────────────
+  // ── Derived state ──────────────────────────────────────────────────────────
 
-  public readonly currentStep   = this.stepSig.asReadonly();
-  public readonly build         = this.buildSig.asReadonly();
-  public readonly compareOpen   = this.compareOpenSig.asReadonly();
-  public readonly compareTarget = this.compareTargetSig.asReadonly();
-  public readonly isComplete    = this.completeSig.asReadonly();
-  public readonly totalSteps    = WIZARD_STEPS.length;
+  public readonly structureStats = computed(() => {
+    const s = STRUCTURE_OPTIONS.find(o => o.id === this.buildSig().structure);
+    return s ? s.stats : null;
+  });
 
-  // ── Derived state ───────────────────────────────────────────────────────────
+  public readonly driveStats = computed(() => {
+    const d = DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive);
+    return d ? d.stats : null;
+  });
+
+  public readonly driveAccentColor = computed(() =>
+    DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive)?.accentColor ?? null
+  );
+
+  public readonly driveCycleType = computed(() =>
+    DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive)?.cycleType ?? null
+  );
+
+  public readonly finishHex = computed(() =>
+    FINISH_OPTIONS.find(o => o.id === this.buildSig().finish)?.hex ?? null
+  );
 
   public readonly canAdvance = computed((): boolean => {
     const b = this.buildSig();
     switch (this.stepSig()) {
-      case 1: return b.chassis !== null;
-      case 2: return b.engine  !== null;
+      case 1: return b.structure !== null;
+      case 2: return b.drive !== null;
       case 3: return this.canFinish();
       default: return false;
     }
@@ -61,135 +82,118 @@ export class GearBuilderService {
 
   public readonly canFinish = computed((): boolean => {
     const b = this.buildSig();
-    return b.color !== null && b.rim !== null && b.bodyKit !== null;
+    return b.finish !== null && b.detail !== null && b.module !== null;
   });
 
   public readonly hasBuildStarted = computed((): boolean => {
     const b = this.buildSig();
-    return !!(b.chassis || b.engine || b.color || b.rim || b.bodyKit);
+    return !!(b.structure || b.drive || b.finish || b.detail || b.module);
   });
 
   public readonly buildChips = computed((): BuildChip[] => {
     const b = this.buildSig();
     return [
-      { label: 'Chassis', icon: 'fas fa-car-side',
-        value: CHASSIS_OPTIONS.find(o => o.id === b.chassis)?.name ?? null },
-      { label: 'Engine',  icon: 'fas fa-gears',
-        value: ENGINE_OPTIONS.find(o => o.id === b.engine)?.name ?? null },
-      { label: 'Color',   icon: 'fas fa-droplet',
-        value: COLOR_OPTIONS.find(o => o.id === b.color)?.name ?? null },
-      { label: 'Rims',    icon: 'fas fa-circle-dot',
-        value: RIM_OPTIONS.find(o => o.id === b.rim)?.name ?? null },
-      { label: 'Kit',     icon: 'fas fa-rocket',
-        value: BODY_KIT_OPTIONS.find(o => o.id === b.bodyKit)?.name ?? null },
+      { label: 'Structure', icon: 'fas fa-cube',         value: STRUCTURE_OPTIONS.find(o => o.id === b.structure)?.name ?? null },
+      { label: 'Drive',     icon: 'fas fa-bolt',          value: DRIVE_OPTIONS.find(o => o.id === b.drive)?.name ?? null         },
+      { label: 'Finish',    icon: 'fas fa-palette',       value: FINISH_OPTIONS.find(o => o.id === b.finish)?.name ?? null       },
+      { label: 'Detail',    icon: 'fas fa-vector-square', value: DETAIL_OPTIONS.find(o => o.id === b.detail)?.name ?? null       },
+      { label: 'Module',    icon: 'fas fa-plug',          value: MODULE_OPTIONS.find(o => o.id === b.module)?.name ?? null       },
     ];
   });
 
-  public readonly chassisStats = computed(() =>
-    CHASSIS_OPTIONS.find(o => o.id === this.buildSig().chassis)?.stats ?? null
-  );
-  public readonly engineStats = computed(() =>
-    ENGINE_OPTIONS.find(o => o.id === this.buildSig().engine)?.stats ?? null
-  );
-  public readonly chassisName = computed(() =>
-    CHASSIS_OPTIONS.find(o => o.id === this.buildSig().chassis)?.name ?? ''
-  );
-  public readonly engineName = computed(() =>
-    ENGINE_OPTIONS.find(o => o.id === this.buildSig().engine)?.name ?? ''
-  );
-  public readonly colorName = computed(() =>
-    COLOR_OPTIONS.find(o => o.id === this.buildSig().color)?.name ?? ''
-  );
-  public readonly isElectric = computed(() =>
-    this.buildSig().engine === 'electric'
-  );
-  public readonly compareTitle = computed((): string => ({
-    chassis: 'Chassis Types',
-    engine:  'Engine Options',
-    color:   'Paint Colors',
-    rim:     'Wheel Styles',
-  })[this.compareTargetSig()]);
-
-  // ── Panel state ─────────────────────────────────────────────────────────────
-
-  public isPanelOpen(key: string): boolean {
-    return this.openPanelsSig().has(key);
-  }
-
-  public togglePanel(key: string): void {
-    this.openPanelsSig.update(s => {
-      const next = new Set(s);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-  }
-
-  // ── Navigation ──────────────────────────────────────────────────────────────
-
-  public nextStep(): void {
-    if (this.stepSig() < this.totalSteps) this.stepSig.update(s => s + 1);
-  }
-
-  public prevStep(): void {
-    if (this.stepSig() > 1) {
-      this.stepSig.update(s => s - 1);
-      this.completeSig.set(false);
+  public readonly compareTitle = computed((): string => {
+    switch (this.compareTargetSig()) {
+      case 'structure': return 'Compare Structures';
+      case 'drive':     return 'Compare Drive Types';
+      default:          return 'Compare';
     }
-  }
+  });
+
+  public readonly resultData = computed((): WizardResultData => {
+    const b   = this.buildSig();
+    const str = STRUCTURE_OPTIONS.find(o => o.id === b.structure);
+    const drv = DRIVE_OPTIONS.find(o => o.id === b.drive);
+    const fin = FINISH_OPTIONS.find(o => o.id === b.finish);
+    const det = DETAIL_OPTIONS.find(o => o.id === b.detail);
+    const mod = MODULE_OPTIONS.find(o => o.id === b.module);
+    return {
+      title: 'Your Object is Complete!',
+      description: 'Configuration saved. Export as JSON or CSV to use this build downstream.',
+      rows: [
+        { label: 'Structure',   value: str?.name ?? '—'                                    },
+        { label: 'Drive',       value: drv?.name ?? '—'                                    },
+        { label: 'Finish',      value: fin?.name ?? '—'                                    },
+        { label: 'Detail',      value: det?.name ?? '—'                                    },
+        { label: 'Module',      value: mod?.name ?? '—'                                    },
+        { label: 'Output',      value: drv ? `${drv.stats.output} u`      : '—'            },
+        { label: 'Efficiency',  value: drv ? `${drv.stats.efficiency}%`   : '—'            },
+        { label: 'Mass',        value: str ? `${str.stats.mass}/10`        : '—'            },
+        { label: 'Rigidity',    value: str ? `${str.stats.rigidity}/10`    : '—'            },
+      ],
+      jsonPayload: { structure: b.structure, drive: b.drive, finish: b.finish, detail: b.detail, module: b.module },
+    };
+  });
+
+  // ── Step navigation ────────────────────────────────────────────────────────
 
   public isStepReachable(n: number): boolean {
     const b = this.buildSig();
-    return (
-      n <= this.stepSig() ||
-      (n === 2 && b.chassis !== null) ||
-      (n === 3 && b.engine  !== null)
-    );
+    if (n <= this.stepSig()) return true;
+    if (n === 2) return b.structure !== null;
+    if (n === 3) return b.structure !== null && b.drive !== null;
+    return false;
+  }
+
+  public nextStep(): void {
+    if (this.stepSig() < WIZARD_STEPS.length && this.canAdvance()) {
+      this.stepSig.update(s => s + 1);
+    }
+  }
+
+  public prevStep(): void {
+    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
   }
 
   public jumpToStep(n: number): void {
     if (this.isStepReachable(n)) this.stepSig.set(n);
   }
 
-  public finish(): void {
-    if (this.canFinish()) this.completeSig.set(true);
-  }
+  public finish(): void { this.stepSig.set(4); }
 
   public reset(): void {
-    this.buildSig.set(EMPTY_BUILD);
+    this.buildSig.set({ structure: null, drive: null, finish: null, detail: null, module: null });
     this.stepSig.set(1);
-    this.completeSig.set(false);
     this.openPanelsSig.set(new Set());
     this.compareOpenSig.set(false);
   }
 
-  // ── Selection ───────────────────────────────────────────────────────────────
+  // ── Selection ──────────────────────────────────────────────────────────────
 
-  public selectChassis(id: ChassisId | string): void {
-    const valid = CHASSIS_OPTIONS.find(o => o.id === id);
-    if (valid) this.buildSig.update(b => ({ ...b, chassis: valid.id }));
-  }
-  public selectEngine(id: EngineId | string): void {
-    const valid = ENGINE_OPTIONS.find(o => o.id === id);
-    if (valid) this.buildSig.update(b => ({ ...b, engine: valid.id }));
-  }
-  public selectColor(id: ColorId): void {
-    this.buildSig.update(b => ({ ...b, color: id }));
-  }
-  public selectRim(id: RimId): void {
-    this.buildSig.update(b => ({ ...b, rim: id }));
-  }
-  public selectBodyKit(id: BodyKitId): void {
-    this.buildSig.update(b => ({ ...b, bodyKit: id }));
-  }
+  public selectStructure(id: StructureId): void { this.buildSig.update(b => ({ ...b, structure: id })); }
+  public selectDrive(id: DriveId):         void { this.buildSig.update(b => ({ ...b, drive: id }));     }
+  public selectFinish(id: FinishId):       void { this.buildSig.update(b => ({ ...b, finish: id }));    }
+  public selectDetail(id: DetailId):       void { this.buildSig.update(b => ({ ...b, detail: id }));    }
+  public selectModule(id: ModuleId):       void { this.buildSig.update(b => ({ ...b, module: id }));    }
 
-  // ── Compare modal ───────────────────────────────────────────────────────────
+  // ── Compare modal ──────────────────────────────────────────────────────────
 
   public openCompare(target: CompareTarget): void {
     this.compareTargetSig.set(target);
     this.compareOpenSig.set(true);
   }
+  public closeCompare(): void { this.compareOpenSig.set(false); }
 
-  public closeCompare(): void {
-    this.compareOpenSig.set(false);
+  // ── Expandable panels ──────────────────────────────────────────────────────
+
+  public togglePanel(id: string): void {
+    this.openPanelsSig.update(set => {
+      const next = new Set(set);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
+      return next;
+    });
+  }
+
+  public isPanelOpen(id: string): boolean {
+    return this.openPanelsSig().has(id);
   }
 }

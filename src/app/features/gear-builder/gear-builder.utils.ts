@@ -1,18 +1,9 @@
-export interface SpokeCoord {
-  readonly x1: number;
-  readonly y1: number;
-  readonly x2: number;
-  readonly y2: number;
+// Geometry helpers for object-preview schematic.
+
+export function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
 }
 
-export function buildSpokes(count: number, innerR: number, outerR: number): SpokeCoord[] {
-  return Array.from({ length: count }, (_, i): SpokeCoord => {
-    const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
-    return {
-      x1: Math.cos(angle) * innerR,
-      y1: Math.sin(angle) * innerR,
-      x2: Math.cos(angle) * outerR,
-      y2: Math.sin(angle) * outerR,
-    };
-  });
+export function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
 }

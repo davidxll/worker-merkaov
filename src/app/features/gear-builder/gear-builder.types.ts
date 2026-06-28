@@ -1,100 +1,71 @@
-export type { WizardStep } from '../../models/models.js';
+export type { WizardStep } from "../../models/models.js";
 
-// ── Build option IDs ─────────────────────────────────────────────────────────
+// ── Selection IDs ────────────────────────────────────────────────────────────
 
-export type ChassisId = 'sedan' | 'suv' | 'truck' | 'coupe';
-export type EngineId  = 'electric' | 'turbo4' | 'v6' | 'v8';
-export type ColorId   = 'midnight' | 'arctic' | 'racing' | 'ocean' | 'forest' | 'sunset';
-export type RimId     = 'steel' | 'alloy' | 'carbon' | 'chrome';
-export type BodyKitId = 'none' | 'sport' | 'offroad' | 'aero';
+export type StructureId = "monolith" | "lattice" | "shell" | "modular";
+export type DriveId     = "pulse" | "wave" | "field" | "kinetic";
+export type FinishId    = "void" | "frost" | "ember" | "tide" | "canopy" | "corona";
+export type DetailId    = "minimal" | "radiator" | "fractal" | "mirror";
+export type ModuleId    = "none" | "amplifier" | "stabiliser" | "resonator";
 
-export interface GearBuild {
-  chassis:  ChassisId | null;
-  engine:   EngineId  | null;
-  color:    ColorId   | null;
-  rim:      RimId     | null;
-  bodyKit:  BodyKitId | null;
+// ── Build state ──────────────────────────────────────────────────────────────
+
+export interface ObjectBuild {
+  structure: StructureId | null;
+  drive:     DriveId     | null;
+  finish:    FinishId    | null;
+  detail:    DetailId    | null;
+  module:    ModuleId    | null;
 }
 
-export interface ChassisOption {
-  readonly id:          ChassisId;
+// ── Option interfaces ────────────────────────────────────────────────────────
+
+export interface StructureOption {
+  readonly id:          StructureId;
   readonly name:        string;
   readonly tagline:     string;
   readonly description: string;
   readonly icon:        string;
   readonly stats: {
-    readonly weight:    number;  // kg
-    readonly seats:     number;
-    readonly dragCoeff: number;
+    readonly mass:     number;   // relative 1-10
+    readonly rigidity: number;   // relative 1-10
+    readonly surface:  number;   // relative surface area 1-10
   };
 }
 
-export interface EngineOption {
-  readonly id:          EngineId;
+export interface DriveOption {
+  readonly id:          DriveId;
   readonly name:        string;
   readonly tagline:     string;
   readonly icon:        string;
   readonly accentColor: string;
-  readonly fuelType:    'electric' | 'gasoline' | 'diesel';
+  readonly cycleType:   "pulsed" | "continuous" | "ambient" | "mechanical";
   readonly stats: {
-    readonly hp:         number;
-    readonly torqueNm:   number;
-    readonly efficiency: number; // mpg / MPGe
+    readonly output:     number;  // peak output units
+    readonly efficiency: number;  // percentage
+    readonly cycleMs:    number;  // 0 = continuous
   };
 }
 
-export interface ColorOption {
-  readonly id:       ColorId;
+export interface FinishOption {
+  readonly id:       FinishId;
   readonly name:     string;
   readonly hex:      string;
   readonly metallic: boolean;
 }
 
-export interface RimOption {
-  readonly id:         RimId;
-  readonly name:       string;
+export interface DetailOption {
+  readonly id:          DetailId;
+  readonly name:        string;
   readonly description: string;
-  readonly hubColor:   string;
-  readonly spokeColor: string;
-  readonly spokeCount: number;
-  readonly spokeWidth: number;
+  readonly accentColor: string;
+  readonly edgeColor:   string;
 }
 
-export interface BodyKitOption {
-  readonly id:          BodyKitId;
+export interface ModuleOption {
+  readonly id:          ModuleId;
   readonly name:        string;
   readonly description: string;
   readonly icon:        string;
   readonly adds:        ReadonlyArray<string>;
-}
-
-// ── SVG vehicle config per chassis ──────────────────────────────────────────
-
-export interface WheelSpec {
-  readonly cx: number;
-  readonly cy: number;
-  readonly r:  number;
-}
-
-export interface RectSpec {
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-}
-
-export interface ChassisConfig {
-  readonly bodyPath:        string;
-  readonly frontWindowPath: string;
-  readonly rearWindowPath:  string;
-  readonly bPillarPath:     string | null;
-  readonly truckBedPath:    string | null;
-  readonly headlight:       RectSpec;
-  readonly taillight:       RectSpec;
-  readonly leftWheel:       WheelSpec;
-  readonly rightWheel:      WheelSpec;
-  readonly frontLipPath:    string;
-  readonly spoilerPath:     string;
-  readonly roofRackSpec:    RectSpec | null;
-  readonly badgePos:        { readonly x: number; readonly y: number };
 }

@@ -7,6 +7,7 @@ import type {
   ExperimentConfig, WizardStep,
   ContainmentId, ExcitationId, DetectorId, OutputFormatId,
 } from './experiment-designer.types.js';
+import type { WizardResultData } from '../../shared/wizard-result.types.js';
 
 export interface ConfigChip {
   readonly label: string;
@@ -32,15 +33,14 @@ export class ExperimentDesignerService {
   private readonly configSig      = signal<ExperimentConfig>(EMPTY_CONFIG);
   private readonly openPanelsSig  = signal<ReadonlySet<string>>(new Set());
   private readonly compareOpenSig = signal<boolean>(false);
-  private readonly completeSig    = signal<boolean>(false);
 
   // ── Public read-only signals ────────────────────────────────────────────────
 
   public readonly currentStep  = this.stepSig.asReadonly();
   public readonly config       = this.configSig.asReadonly();
   public readonly compareOpen  = this.compareOpenSig.asReadonly();
-  public readonly isComplete   = this.completeSig.asReadonly();
   public readonly totalSteps   = WIZARD_STEPS.length;
+  public readonly isComplete   = computed(() => this.stepSig() > this.totalSteps);
 
   // ── Derived state ───────────────────────────────────────────────────────────
 
@@ -103,6 +103,21 @@ export class ExperimentDesignerService {
     OUTPUT_FORMAT_OPTIONS.find(o => o.id === this.configSig().outputFormat)?.name ?? ''
   );
 
+  public readonly resultData = computed((): WizardResultData => {
+    const c = this.configSig();
+    return {
+      title:       'Experiment Configured!',
+      description: 'Your krypton spectroscopy apparatus is ready for review.',
+      rows: [
+        { label: 'Containment', value: this.containmentName()  || '—' },
+        { label: 'Excitation',  value: this.excitationName()   || '—' },
+        { label: 'Detector',    value: this.detectorName()     || '—' },
+        { label: 'Output',      value: this.outputFormatName() || '—' },
+      ],
+      jsonPayload: { ...c },
+    };
+  });
+
   // ── Panel state ─────────────────────────────────────────────────────────────
 
   public isPanelOpen(key: string): boolean {
@@ -112,7 +127,7 @@ export class ExperimentDesignerService {
   public togglePanel(key: string): void {
     this.openPanelsSig.update(s => {
       const next = new Set(s);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) { next.delete(key); } else { next.add(key); }
       return next;
     });
   }
@@ -124,10 +139,7 @@ export class ExperimentDesignerService {
   }
 
   public prevStep(): void {
-    if (this.stepSig() > 1) {
-      this.stepSig.update(s => s - 1);
-      this.completeSig.set(false);
-    }
+    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
   }
 
   public isStepReachable(n: number): boolean {
@@ -144,13 +156,12 @@ export class ExperimentDesignerService {
   }
 
   public finish(): void {
-    if (this.canFinish()) this.completeSig.set(true);
+    if (this.canFinish()) this.stepSig.set(this.totalSteps + 1);
   }
 
   public reset(): void {
     this.configSig.set(EMPTY_CONFIG);
     this.stepSig.set(1);
-    this.completeSig.set(false);
     this.openPanelsSig.set(new Set());
     this.compareOpenSig.set(false);
   }

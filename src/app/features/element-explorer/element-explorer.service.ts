@@ -7,6 +7,7 @@ import type {
   ChemElement, TableConfig, LayoutStyle, ColorScheme, DetailLevel, FilterMode, WizardStep,
 } from './element-explorer.types.js';
 import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import type { WizardResultData } from '../../shared/wizard-result.types.js';
 
 export { WIZARD_STEPS };
 
@@ -28,19 +29,18 @@ export class ElementExplorerService {
 
   // ── Raw state ───────────────────────────────────────────────────────────────
 
-  private readonly stepSig           = signal<number>(1);
-  private readonly configSig         = signal<TableConfig>(EMPTY_CONFIG);
-  private readonly completeSig       = signal<boolean>(false);
+  private readonly stepSig            = signal<number>(1);
+  private readonly configSig          = signal<TableConfig>(EMPTY_CONFIG);
   private readonly selectedElementSig = signal<ChemElement | null>(null);
 
   // ── Public read-only signals ────────────────────────────────────────────────
 
   public readonly currentStep     = this.stepSig.asReadonly();
   public readonly config          = this.configSig.asReadonly();
-  public readonly isComplete      = this.completeSig.asReadonly();
   public readonly selectedElement = this.selectedElementSig.asReadonly();
   public readonly totalSteps      = WIZARD_STEPS.length;
   public readonly allElements     = ELEMENTS;
+  public readonly isComplete      = computed(() => this.stepSig() > this.totalSteps);
 
   // ── Derived state ───────────────────────────────────────────────────────────
 
@@ -132,10 +132,7 @@ export class ElementExplorerService {
   }
 
   public prevStep(): void {
-    if (this.stepSig() > 1) {
-      this.stepSig.update(s => s - 1);
-      this.completeSig.set(false);
-    }
+    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
   }
 
   public jumpToStep(n: number): void {
@@ -143,13 +140,12 @@ export class ElementExplorerService {
   }
 
   public finish(): void {
-    if (this.canFinish()) this.completeSig.set(true);
+    if (this.canFinish()) this.stepSig.set(this.totalSteps + 1);
   }
 
   public reset(): void {
     this.configSig.set(EMPTY_CONFIG);
     this.stepSig.set(1);
-    this.completeSig.set(false);
     this.selectedElementSig.set(null);
   }
 
@@ -176,6 +172,22 @@ export class ElementExplorerService {
   public selectElement(el: ChemElement | null): void {
     this.selectedElementSig.set(el);
   }
+
+  public readonly resultData = computed((): WizardResultData => {
+    const c = this.configSig();
+    return {
+      title:       'Your Periodic Table is Ready!',
+      description: 'Here\'s the configuration for your custom periodic table.',
+      rows: [
+        { label: 'Layout',         value: c.layout      ?? '—' },
+        { label: 'Color Scheme',   value: c.colorScheme ?? '—' },
+        { label: 'Detail Level',   value: c.detailLevel ?? '—' },
+        { label: 'Filter',         value: c.filter      ?? '—' },
+        { label: 'Elements shown', value: String(this.filteredElements().length) },
+      ],
+      jsonPayload: { ...c, elementCount: this.filteredElements().length },
+    };
+  });
 
   // ── Grid position helpers ───────────────────────────────────────────────────
 

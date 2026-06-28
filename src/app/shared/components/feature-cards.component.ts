@@ -87,7 +87,7 @@ import type { FeatureCard } from '../../models/models';
       width: 36px;
       height: 36px;
       border-radius: 4px;
-      background: rgba(0,120,212,0.15);
+      background: rgba(62,143,200,0.15);
       color: var(--f-accent-light);
       font-size: 16px;
     }
@@ -110,7 +110,7 @@ import type { FeatureCard } from '../../models/models';
       height: 18px;
       padding: 0 6px;
       border-radius: 4px;
-      background: rgba(0,120,212,0.20);
+      background: rgba(62,143,200,0.20);
       color: var(--f-accent-light);
       font-size: 11px;
       font-weight: 600;

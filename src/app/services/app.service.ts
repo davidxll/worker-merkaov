@@ -10,7 +10,7 @@ export class AppService {
       { label: 'Home',                icon: 'fas fa-house',  route: '/app/home'                    },
       { label: 'Element Explorer',    icon: 'fas fa-atom',   route: '/app/element-explorer'        },
       { label: 'Experiment Designer', icon: 'fas fa-flask',  route: '/app/experiment-designer'     },
-      { label: 'Gear Builder',        icon: 'fas fa-wrench', route: '/app/gear-builder'            },
+      { label: 'Object Builder',       icon: 'fas fa-cube',   route: '/app/gear-builder'            },
     ]);
   }
 

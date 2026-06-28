@@ -19,14 +19,14 @@ import type { NavItem } from '../models/models';
     <aside class="nav-pane" aria-label="Site navigation" [class.collapsed]="layout.collapsed()" [class.mobile-open]="layout.mobileOpen()">
 
       <!-- Logo / pane header -->
-      <div class="pane-header">
+      <a class="pane-header" routerLink="/welcome" aria-label="Go to landing page">
         <span class="pane-logo-icon">
           <i class="fas fa-gear" aria-hidden="true"></i>
         </span>
         @if (!layout.collapsed()) {
           <span class="pane-logo-text">Waltkerovoz</span>
         }
-      </div>
+      </a>
 
       <!-- Collapse toggle (desktop only) -->
       <button class="collapse-btn" (click)="layout.toggle()"
@@ -113,6 +113,11 @@ import type { NavItem } from '../models/models';
       height: 48px;
       padding: 0 8px;
       overflow: hidden;
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 150ms var(--f-ease);
+      &:hover { background: rgba(255,255,255,0.06); }
     }
     .pane-logo-icon {
       display: flex;

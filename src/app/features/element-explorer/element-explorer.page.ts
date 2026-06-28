@@ -8,13 +8,14 @@ import {
 import { LAYOUT_OPTIONS, COLOR_OPTIONS, DETAIL_OPTIONS, FILTER_OPTIONS } from './element-explorer.mock.js';
 import type { ChemElement } from './element-explorer.types.js';
 import { ElementTableComponent } from './components/element-table.component.js';
+import { WizardResultComponent } from '../../shared/components/wizard-result.component.js';
 
 @Component({
   selector: 'app-element-explorer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ELEMENT_EXPLORER_WIZARD_PROVIDER],
-  imports: [CommonModule, WizardStepDirective, ElementTableComponent],
+  imports: [CommonModule, WizardStepDirective, ElementTableComponent, WizardResultComponent],
   template: `
     <!-- ── Sticky HUD ─────────────────────────────────────────────────────── -->
     <header class="hud">
@@ -265,44 +266,43 @@ import { ElementTableComponent } from './components/element-table.component.js';
 
     <!-- ── Completion: Full Periodic Table ───────────────────────────────── -->
     @if (svc.isComplete()) {
-      <div class="table-stage">
+      <app-wizard-result
+        [title]="svc.resultData().title"
+        [description]="svc.resultData().description"
+        [data]="svc.resultData()">
 
-        <div class="table-toolbar">
-          <span class="table-title">
-            <i class="fas fa-atom" aria-hidden="true"></i>
-            Your Periodic Table
-          </span>
-          <span class="table-stats">
-            {{ svc.filteredElements().length }} elements
-            · {{ svc.config().colorScheme }} colours
-            · {{ svc.config().detailLevel }} detail
-          </span>
+        <div class="table-stage">
+          <div class="table-toolbar">
+            <span class="table-title">
+              <i class="fas fa-atom" aria-hidden="true"></i>
+              Your Periodic Table
+            </span>
+            <span class="table-stats">
+              {{ svc.filteredElements().length }} elements
+              · {{ svc.config().colorScheme }} colours
+              · {{ svc.config().detailLevel }} detail
+            </span>
 
-          <!-- View mode toggle -->
-          <div class="view-toggle" role="group" aria-label="View mode">
-            <button
-              class="vt-btn"
-              [class.vt-btn--active]="viewMode() === 'grid'"
-              (click)="viewMode.set('grid')"
-              title="Periodic Table">
-              <i class="fas fa-table-cells" aria-hidden="true"></i>
-              Table
-            </button>
-            <button
-              class="vt-btn"
-              [class.vt-btn--active]="viewMode() === 'data'"
-              (click)="viewMode.set('data')"
-              title="Data Grid">
-              <i class="fas fa-database" aria-hidden="true"></i>
-              Data
-            </button>
+            <!-- View mode toggle -->
+            <div class="view-toggle" role="group" aria-label="View mode">
+              <button
+                class="vt-btn"
+                [class.vt-btn--active]="viewMode() === 'grid'"
+                (click)="viewMode.set('grid')"
+                title="Periodic Table">
+                <i class="fas fa-table-cells" aria-hidden="true"></i>
+                Table
+              </button>
+              <button
+                class="vt-btn"
+                [class.vt-btn--active]="viewMode() === 'data'"
+                (click)="viewMode.set('data')"
+                title="Data Grid">
+                <i class="fas fa-database" aria-hidden="true"></i>
+                Data
+              </button>
+            </div>
           </div>
-
-          <button class="btn-reset" (click)="svc.reset(); viewMode.set('grid')">
-            <i class="fas fa-rotate-left" aria-hidden="true"></i>
-            Build Another
-          </button>
-        </div>
 
         <!-- Data grid view -->
         @if (viewMode() === 'data') {
@@ -436,7 +436,13 @@ import { ElementTableComponent } from './components/element-table.component.js';
           </div>
         }
 
-      </div>
+        </div><!-- /table-stage -->
+
+        <button resultActions class="btn-reset" (click)="svc.reset(); viewMode.set('grid')" type="button">
+          <i class="fas fa-rotate-left" aria-hidden="true"></i>
+          Build Another
+        </button>
+      </app-wizard-result>
     }
   `,
   styles: [`
