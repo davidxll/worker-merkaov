@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
-import { GearBuilderService, WIZARD_STEPS, type CompareTarget } from './gear-builder.service.js';
+import { GearBuilderService, GEAR_BUILDER_WIZARD_PROVIDER, WIZARD_STEPS, type CompareTarget } from './gear-builder.service.js';
 import { ObjectPreviewComponent } from './components/object-preview.component.js';
 import { WizardResultComponent } from '../../shared/components/wizard-result.component.js';
 import {
@@ -16,6 +16,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ObjectPreviewComponent, WizardResultComponent],
+  providers: [GEAR_BUILDER_WIZARD_PROVIDER],
   template: `
 <!-- ═══════════════════════════════════════════════════════════
      OBJECT BUILDER PAGE
@@ -28,7 +29,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
 
       <!-- Mini preview -->
       <div class="hud-preview">
-        <app-object-preview [build]="gb.buildSig()" [compact]="true"/>
+        <app-object-preview [build]="gb.build()" [compact]="true"/>
       </div>
 
       <!-- Build chips + live stats -->
@@ -62,8 +63,8 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
       <div class="hud-steps">
         @for (step of steps; track step.label; let i = $index) {
           <button class="step-tab"
-                  [class.step-tab--active]="gb.stepSig() === i + 1"
-                  [class.step-tab--done]="gb.stepSig() > i + 1"
+                  [class.step-tab--active]="gb.currentStep() === i + 1"
+                  [class.step-tab--done]="gb.currentStep() > i + 1"
                   [disabled]="!gb.isStepReachable(i + 1)"
                   (click)="gb.jumpToStep(i + 1)">
             <i [class]="step.icon + ' step-icon'"></i>
@@ -79,7 +80,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
   <div class="gb-content">
 
     <!-- ══ STEP 1 — STRUCTURE ══════════════════════════════════ -->
-    @if (gb.stepSig() === 1) {
+    @if (gb.currentStep() === 1) {
       <section class="step-section">
         <div class="step-header">
           <h2 class="step-title">Choose a Structure</h2>
@@ -89,7 +90,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
         <!-- Quick select -->
         <div class="quick-row">
           <label class="quick-label">Quick select</label>
-          <select class="quick-select" [value]="gb.buildSig().structure ?? ''"
+          <select class="quick-select" [value]="gb.build().structure ?? ''"
                   (change)="gb.selectStructure($any($event.target).value)">
             <option value="" disabled>— pick one —</option>
             @for (s of structures; track s.id) {
@@ -104,7 +105,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
         <!-- Options grid -->
         <div class="opt-grid">
           @for (s of structures; track s.id) {
-            <div class="opt-card" [class.opt-card--selected]="gb.buildSig().structure === s.id"
+            <div class="opt-card" [class.opt-card--selected]="gb.build().structure === s.id"
                  (click)="gb.selectStructure(s.id)">
               <div class="opt-card-header">
                 <i [class]="s.icon + ' opt-icon'"></i>
@@ -112,7 +113,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
                   <span class="opt-name">{{ s.name }}</span>
                   <span class="opt-tagline">{{ s.tagline }}</span>
                 </div>
-                @if (gb.buildSig().structure === s.id) {
+                @if (gb.build().structure === s.id) {
                   <i class="fas fa-circle-check opt-check"></i>
                 }
               </div>
@@ -139,7 +140,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
         </div>
 
         <!-- Expandable specs panel -->
-        @if (gb.buildSig().structure; as sid) {
+        @if (gb.build().structure; as sid) {
           <div class="specs-panel">
             <button class="specs-toggle" (click)="gb.togglePanel('structure-specs')">
               <i class="fas fa-chevron-right specs-caret" [class.rotate-90]="gb.isPanelOpen('structure-specs')"></i>
@@ -167,7 +168,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
     }
 
     <!-- ══ STEP 2 — DRIVE ══════════════════════════════════════ -->
-    @if (gb.stepSig() === 2) {
+    @if (gb.currentStep() === 2) {
       <section class="step-section">
         <div class="step-header">
           <h2 class="step-title">Choose a Drive</h2>
@@ -176,7 +177,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
 
         <div class="quick-row">
           <label class="quick-label">Quick select</label>
-          <select class="quick-select" [value]="gb.buildSig().drive ?? ''"
+          <select class="quick-select" [value]="gb.build().drive ?? ''"
                   (change)="gb.selectDrive($any($event.target).value)">
             <option value="" disabled>— pick one —</option>
             @for (d of drives; track d.id) {
@@ -190,7 +191,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
 
         <div class="opt-grid">
           @for (d of drives; track d.id) {
-            <div class="opt-card" [class.opt-card--selected]="gb.buildSig().drive === d.id"
+            <div class="opt-card" [class.opt-card--selected]="gb.build().drive === d.id"
                  (click)="gb.selectDrive(d.id)">
               <div class="opt-card-header">
                 <i [class]="d.icon + ' opt-icon'" [style.color]="d.accentColor"></i>
@@ -199,7 +200,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
                   <span class="opt-tagline">{{ d.tagline }}</span>
                 </div>
                 <span class="cycle-badge cycle-badge--{{ d.cycleType }}">{{ d.cycleType }}</span>
-                @if (gb.buildSig().drive === d.id) {
+                @if (gb.build().drive === d.id) {
                   <i class="fas fa-circle-check opt-check"></i>
                 }
               </div>
@@ -227,7 +228,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           }
         </div>
 
-        @if (gb.buildSig().drive; as did) {
+        @if (gb.build().drive; as did) {
           <div class="specs-panel">
             <button class="specs-toggle" (click)="gb.togglePanel('drive-specs')">
               <i class="fas fa-chevron-right specs-caret" [class.rotate-90]="gb.isPanelOpen('drive-specs')"></i>
@@ -254,7 +255,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
     }
 
     <!-- ══ STEP 3 — FINISH + DETAIL + MODULE ════════════════════ -->
-    @if (gb.stepSig() === 3) {
+    @if (gb.currentStep() === 3) {
       <section class="step-section">
         <div class="step-header">
           <h2 class="step-title">Finish Your Build</h2>
@@ -266,7 +267,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           <h3 class="styling-title"><i class="fas fa-palette mr-2 opacity-60"></i>Surface Finish</h3>
           <div class="finish-grid">
             @for (f of finishes; track f.id) {
-              <button class="finish-swatch" [class.finish-swatch--selected]="gb.buildSig().finish === f.id"
+              <button class="finish-swatch" [class.finish-swatch--selected]="gb.build().finish === f.id"
                       (click)="gb.selectFinish(f.id)" [title]="f.name">
                 <span class="swatch-circle" [style.background]="f.hex"
                       [class.metallic]="f.metallic"></span>
@@ -281,7 +282,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           <h3 class="styling-title"><i class="fas fa-vector-square mr-2 opacity-60"></i>Edge Detail</h3>
           <div class="detail-grid">
             @for (d of details; track d.id) {
-              <div class="detail-card" [class.detail-card--selected]="gb.buildSig().detail === d.id"
+              <div class="detail-card" [class.detail-card--selected]="gb.build().detail === d.id"
                    (click)="gb.selectDetail(d.id)">
                 <!-- Small SVG pattern preview -->
                 <svg viewBox="0 0 48 48" class="detail-pattern" [attr.stroke]="d.edgeColor" fill="none">
@@ -319,7 +320,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
                   <span class="detail-name">{{ d.name }}</span>
                   <span class="detail-desc">{{ d.description }}</span>
                 </div>
-                @if (gb.buildSig().detail === d.id) {
+                @if (gb.build().detail === d.id) {
                   <i class="fas fa-circle-check detail-check"></i>
                 }
               </div>
@@ -332,12 +333,12 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           <h3 class="styling-title"><i class="fas fa-plug mr-2 opacity-60"></i>Module Attachment</h3>
           <div class="module-grid">
             @for (m of modules; track m.id) {
-              <div class="module-card" [class.module-card--selected]="gb.buildSig().module === m.id"
+              <div class="module-card" [class.module-card--selected]="gb.build().module === m.id"
                    (click)="gb.selectModule(m.id)">
                 <div class="module-card-header">
                   <i [class]="m.icon + ' module-icon'"></i>
                   <span class="module-name">{{ m.name }}</span>
-                  @if (gb.buildSig().module === m.id) {
+                  @if (gb.build().module === m.id) {
                     <i class="fas fa-circle-check module-check"></i>
                   }
                 </div>
@@ -357,13 +358,13 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
     }
 
     <!-- ══ STEP 4 — RESULT ══════════════════════════════════════ -->
-    @if (gb.stepSig() === 4) {
+    @if (gb.currentStep() === 4) {
       <section class="step-section result-section">
         <app-wizard-result
           [title]="gb.resultData().title"
           [description]="gb.resultData().description"
           [data]="gb.resultData()">
-          <app-object-preview [build]="gb.buildSig()"/>
+          <app-object-preview [build]="gb.build()"/>
         </app-wizard-result>
         <div class="result-actions">
           <button class="start-over-btn" (click)="gb.reset()">
@@ -376,16 +377,16 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
   </div><!-- /gb-content -->
 
   <!-- ── Bottom sticky nav ─────────────────────────────────────── -->
-  @if (gb.stepSig() < 4) {
+  @if (gb.currentStep() < 4) {
     <div class="bottom-nav">
       <div class="bottom-nav-inner">
-        <button class="nav-btn nav-btn--back" [disabled]="gb.stepSig() === 1" (click)="gb.prevStep()">
+        <button class="nav-btn nav-btn--back" [disabled]="gb.currentStep() === 1" (click)="gb.prevStep()">
           <i class="fas fa-arrow-left mr-2"></i>Back
         </button>
         <div class="nav-progress">
-          Step {{ gb.stepSig() }} of {{ steps.length }}
+          Step {{ gb.currentStep() }} of {{ steps.length }}
         </div>
-        @if (gb.stepSig() < steps.length) {
+        @if (gb.currentStep() < steps.length) {
           <button class="nav-btn nav-btn--next" [disabled]="!gb.canAdvance()" (click)="gb.nextStep()">
             Continue<i class="fas fa-arrow-right ml-2"></i>
           </button>
@@ -399,7 +400,7 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
   }
 
   <!-- ── Compare modal ─────────────────────────────────────────── -->
-  @if (gb.compareOpenSig()) {
+  @if (gb.compareOpen()) {
     <div class="modal-backdrop" (click)="gb.closeCompare()">
       <div class="modal-panel" (click)="$event.stopPropagation()">
         <div class="modal-header">
@@ -410,14 +411,14 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
         </div>
 
         <!-- Structure compare -->
-        @if (gb.compareTargetSig() === 'structure') {
+        @if (gb.compareTarget() === 'structure') {
           <div class="compare-table-wrap">
             <table class="compare-table">
               <thead>
                 <tr>
                   <th></th>
                   @for (s of structures; track s.id) {
-                    <th [class.cmp-selected]="gb.buildSig().structure === s.id">
+                    <th [class.cmp-selected]="gb.build().structure === s.id">
                       <i [class]="s.icon + ' mr-1'"></i>{{ s.name }}
                     </th>
                   }
@@ -426,22 +427,22 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
               <tbody>
                 <tr><td class="cmp-label">Tagline</td>
                   @for (s of structures; track s.id) {
-                    <td [class.cmp-selected]="gb.buildSig().structure === s.id">{{ s.tagline }}</td>
+                    <td [class.cmp-selected]="gb.build().structure === s.id">{{ s.tagline }}</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Mass (1–10)</td>
                   @for (s of structures; track s.id) {
-                    <td [class.cmp-selected]="gb.buildSig().structure === s.id">{{ s.stats.mass }}</td>
+                    <td [class.cmp-selected]="gb.build().structure === s.id">{{ s.stats.mass }}</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Rigidity (1–10)</td>
                   @for (s of structures; track s.id) {
-                    <td [class.cmp-selected]="gb.buildSig().structure === s.id">{{ s.stats.rigidity }}</td>
+                    <td [class.cmp-selected]="gb.build().structure === s.id">{{ s.stats.rigidity }}</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Surface (1–10)</td>
                   @for (s of structures; track s.id) {
-                    <td [class.cmp-selected]="gb.buildSig().structure === s.id">{{ s.stats.surface }}</td>
+                    <td [class.cmp-selected]="gb.build().structure === s.id">{{ s.stats.surface }}</td>
                   }
                 </tr>
               </tbody>
@@ -449,23 +450,23 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           </div>
           <div class="compare-actions">
             @for (s of structures; track s.id) {
-              <button class="cmp-select-btn" [class.cmp-select-btn--active]="gb.buildSig().structure === s.id"
+              <button class="cmp-select-btn" [class.cmp-select-btn--active]="gb.build().structure === s.id"
                       (click)="gb.selectStructure(s.id); gb.closeCompare()">
-                {{ gb.buildSig().structure === s.id ? 'Selected' : 'Select ' + s.name }}
+                {{ gb.build().structure === s.id ? 'Selected' : 'Select ' + s.name }}
               </button>
             }
           </div>
         }
 
         <!-- Drive compare -->
-        @if (gb.compareTargetSig() === 'drive') {
+        @if (gb.compareTarget() === 'drive') {
           <div class="compare-table-wrap">
             <table class="compare-table">
               <thead>
                 <tr>
                   <th></th>
                   @for (d of drives; track d.id) {
-                    <th [class.cmp-selected]="gb.buildSig().drive === d.id">
+                    <th [class.cmp-selected]="gb.build().drive === d.id">
                       <i [class]="d.icon + ' mr-1'" [style.color]="d.accentColor"></i>{{ d.name }}
                     </th>
                   }
@@ -474,22 +475,22 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
               <tbody>
                 <tr><td class="cmp-label">Cycle mode</td>
                   @for (d of drives; track d.id) {
-                    <td [class.cmp-selected]="gb.buildSig().drive === d.id">{{ d.cycleType }}</td>
+                    <td [class.cmp-selected]="gb.build().drive === d.id">{{ d.cycleType }}</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Peak output</td>
                   @for (d of drives; track d.id) {
-                    <td [class.cmp-selected]="gb.buildSig().drive === d.id">{{ d.stats.output }} u</td>
+                    <td [class.cmp-selected]="gb.build().drive === d.id">{{ d.stats.output }} u</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Efficiency</td>
                   @for (d of drives; track d.id) {
-                    <td [class.cmp-selected]="gb.buildSig().drive === d.id">{{ d.stats.efficiency }}%</td>
+                    <td [class.cmp-selected]="gb.build().drive === d.id">{{ d.stats.efficiency }}%</td>
                   }
                 </tr>
                 <tr><td class="cmp-label">Cycle time</td>
                   @for (d of drives; track d.id) {
-                    <td [class.cmp-selected]="gb.buildSig().drive === d.id">
+                    <td [class.cmp-selected]="gb.build().drive === d.id">
                       {{ d.stats.cycleMs === 0 ? 'Continuous' : d.stats.cycleMs + ' ms' }}
                     </td>
                   }
@@ -499,9 +500,9 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
           </div>
           <div class="compare-actions">
             @for (d of drives; track d.id) {
-              <button class="cmp-select-btn" [class.cmp-select-btn--active]="gb.buildSig().drive === d.id"
+              <button class="cmp-select-btn" [class.cmp-select-btn--active]="gb.build().drive === d.id"
                       (click)="gb.selectDrive(d.id); gb.closeCompare()">
-                {{ gb.buildSig().drive === d.id ? 'Selected' : 'Select ' + d.name }}
+                {{ gb.build().drive === d.id ? 'Selected' : 'Select ' + d.name }}
               </button>
             }
           </div>
@@ -767,6 +768,6 @@ export class GearBuilderPage implements OnInit {
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
-    if (this.gb.compareOpenSig()) this.gb.closeCompare();
+    if (this.gb.compareOpen()) this.gb.closeCompare();
   }
 }

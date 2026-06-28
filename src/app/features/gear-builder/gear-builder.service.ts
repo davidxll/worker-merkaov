@@ -1,25 +1,14 @@
 import { computed, Injectable, signal } from '@angular/core';
 import {
-  STRUCTURE_OPTIONS, DRIVE_OPTIONS, FINISH_OPTIONS, DETAIL_OPTIONS, MODULE_OPTIONS,
+  WIZARD_STEPS, STRUCTURE_OPTIONS, DRIVE_OPTIONS, FINISH_OPTIONS, DETAIL_OPTIONS, MODULE_OPTIONS,
 } from './gear-builder.mock.js';
 import type {
   ObjectBuild, StructureId, DriveId, FinishId, DetailId, ModuleId,
 } from './gear-builder.types.js';
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
+import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
 
-// ── Wizard step definitions ──────────────────────────────────────────────────
-
-export interface WizardStep {
-  readonly label:    string;
-  readonly icon:     string;
-  readonly sublabel: string;
-}
-
-export const WIZARD_STEPS: readonly WizardStep[] = [
-  { label: 'Structure', icon: 'fas fa-cube',        sublabel: 'Form type'     },
-  { label: 'Drive',     icon: 'fas fa-bolt',         sublabel: 'Power source'  },
-  { label: 'Finish',    icon: 'fas fa-palette',      sublabel: 'Look & detail' },
-];
+export { WIZARD_STEPS };
 
 // ── Compare ──────────────────────────────────────────────────────────────────
 
@@ -40,11 +29,16 @@ export class GearBuilderService {
 
   // ── State ──────────────────────────────────────────────────────────────────
 
-  public readonly stepSig        = signal<number>(1);
-  public readonly buildSig       = signal<ObjectBuild>({ structure: null, drive: null, finish: null, detail: null, module: null });
-  public readonly openPanelsSig  = signal<Set<string>>(new Set());
-  public readonly compareOpenSig = signal<boolean>(false);
-  public readonly compareTargetSig = signal<CompareTarget>('structure');
+  private readonly stepSig          = signal<number>(1);
+  private readonly buildSig         = signal<ObjectBuild>({ structure: null, drive: null, finish: null, detail: null, module: null });
+  private readonly openPanelsSig    = signal<Set<string>>(new Set());
+  private readonly compareOpenSig   = signal<boolean>(false);
+  private readonly compareTargetSig = signal<CompareTarget>('structure');
+
+  public readonly currentStep  = this.stepSig.asReadonly();
+  public readonly build        = this.buildSig.asReadonly();
+  public readonly compareOpen  = this.compareOpenSig.asReadonly();
+  public readonly compareTarget = this.compareTargetSig.asReadonly();
 
   // ── Derived state ──────────────────────────────────────────────────────────
 
@@ -197,3 +191,8 @@ export class GearBuilderService {
     return this.openPanelsSig().has(id);
   }
 }
+
+export const GEAR_BUILDER_WIZARD_PROVIDER = {
+  provide:     WIZARD_STEP_SERVICE,
+  useExisting: GearBuilderService,
+};

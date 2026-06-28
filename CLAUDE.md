@@ -14,6 +14,28 @@ npm test           # Karma/Jasmine unit tests
 
 Dev server launch config lives in `.claude/launch.json` — use `preview_start` with the name `"waltkerovoz dev server"`.
 
+## Git & Version Control
+
+- **Never push to remote or open PRs** unless explicitly asked.
+- **Local commits only** by default. Always confirm the exact repo path before any `git` operation.
+- Never amend published commits or force-push.
+
+## Dev Environment
+
+- Run exactly **one dev server** at a time via the launch config above. Do not spin up secondary preview servers.
+- If `ng` is not on PATH, use `npx ng serve` (e.g. for ad-hoc CLI commands outside the launch config).
+
+## Build & Verification
+
+After any code change, run the build and confirm it passes before reporting done:
+
+```bash
+npm run build   # or: npx ng build
+```
+
+- Stale errors can appear in IDE/LSP logs — treat the **build output** as the source of truth, not editor squiggles.
+- For type-only checks without a full build: `npx tsc --noEmit`.
+
 ## Routing
 
 Two distinct layouts coexist under a bare `<router-outlet>` in `AppComponent`:
@@ -139,6 +161,13 @@ Wizard UI with a sticky HUD, full-width step sections, compare modals, and a com
 - `private readonly xSig = signal<T>(...)` — raw writable signal, never exposed directly
 - `public readonly x = this.xSig.asReadonly()` — externally readable
 - `protected readonly y = computed(...)` — template-only derived state
+- When a template consumes an Observable, convert it with `toSignal()` rather than using the `async` pipe or storing to a plain array. `toSignal` integrates with the signal graph and avoids manual subscription management.
+
+### Angular architecture conventions
+
+- **Smart/Dumb component pattern**: services hold all state and logic (smart); page/component templates are thin shells that inject the service and wire the template (dumb). Pages own no signals of their own.
+- **Prefer shared directives and components** over duplicated logic. If two feature pages need the same behaviour, extract it to `src/app/shared/` first.
+- **Before refactoring state or signals**, scan the templates and consumers to confirm how the data is actually used (signal, observable, or array), state the plan, and confirm before implementing. Mismatches between the refactor plan and template usage cause unnecessary backtracking.
 
 ### Styling
 
@@ -157,6 +186,8 @@ All component styles use `--f-*` tokens exclusively — never raw colours. The a
 **PrimeNG v21** (Aura theme, forced dark — `darkModeSelector: 'none'`). PrimeNG overlays/modals are avoided in favour of `@if`-driven fixed overlays to sidestep unpredictable PrimeNG API behaviour.
 
 **AG Grid v36** — `AllCommunityModule` registered once in `home.page.ts` via `ModuleRegistry.registerModules`. AG Grid is themed via CSS variable overrides in `styles.scss` under `.ag-theme-alpine`.
+
+> **Theming pitfalls:** AG Grid v36 changed several internal class names from earlier versions — always verify against the v36 API when adding or fixing grid styles. PrimeNG injects its CSS variables at runtime (not build time); if a PrimeNG component appears unstyled, check that the `--p-*` variable overrides in `styles.scss` are present and that `darkModeSelector: 'none'` is still set in `providePrimeNG`. After any styling change, visually verify **both light and dark** rendering.
 
 Component style budget is raised to `16 kB` warning / `64 kB` error in `angular.json` to accommodate large page-level style blocks.
 

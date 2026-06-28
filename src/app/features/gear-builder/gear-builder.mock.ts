@@ -1,6 +1,14 @@
 import type {
-  StructureOption, DriveOption, FinishOption, DetailOption, ModuleOption,
+  WizardStep, StructureOption, DriveOption, FinishOption, DetailOption, ModuleOption,
 } from "./gear-builder.types.js";
+
+// ── Wizard step definitions ──────────────────────────────────────────────────
+
+export const WIZARD_STEPS: readonly WizardStep[] = [
+  { label: 'Structure', icon: 'fas fa-cube',    sublabel: 'Form type'     },
+  { label: 'Drive',     icon: 'fas fa-bolt',    sublabel: 'Power source'  },
+  { label: 'Finish',    icon: 'fas fa-palette', sublabel: 'Look & detail' },
+];
 
 // ── Structure options ────────────────────────────────────────────────────────
 
