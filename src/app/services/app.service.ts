@@ -11,6 +11,8 @@ export class AppService {
       { label: 'Element Explorer',    icon: 'fas fa-atom',   route: '/app/element-explorer'        },
       { label: 'Experiment Designer', icon: 'fas fa-flask',  route: '/app/experiment-designer'     },
       { label: 'Object Builder',       icon: 'fas fa-cube',   route: '/app/gear-builder'            },
+      { label: 'MLS Composer',         icon: 'fas fa-magnifying-glass-location', route: '/app/mls-composer' },
+      { label: 'Dream Space',          icon: 'fas fa-wand-magic-sparkles',       route: '/app/dream-space'  },
     ]);
   }
 

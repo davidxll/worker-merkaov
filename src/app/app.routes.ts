@@ -32,6 +32,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/element-explorer/element-explorer.page').then(m => m.ElementExplorerPage),
       },
+      {
+        path: 'mls-composer',
+        loadComponent: () =>
+          import('./features/mls-composer/mls-composer.page').then(m => m.MlsComposerPage),
+      },
+      {
+        path: 'dream-space',
+        loadComponent: () =>
+          import('./features/dream-space/dream-space.page').then(m => m.DreamSpacePage),
+      },
     ],
   },
   { path: '', redirectTo: 'welcome', pathMatch: 'full' },
