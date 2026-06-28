@@ -3,8 +3,8 @@ import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 
 import { ApparatusPreviewComponent } from './components/apparatus-preview.component.js';
-import { ExperimentDesignerService, WIZARD_STEPS } from './experiment-designer.service.js';
-import { WizardStepDirective, WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import { ExperimentDesignerService, EXPERIMENT_DESIGNER_WIZARD_PROVIDER, WIZARD_STEPS } from './experiment-designer.service.js';
+import { WizardStepDirective } from '../../shared/wizard-step.directive.js';
 import { WizardResultComponent } from '../../shared/components/wizard-result.component.js';
 import {
   CONTAINMENT_OPTIONS, EXCITATION_OPTIONS,
@@ -16,7 +16,7 @@ import {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ApparatusPreviewComponent, WizardStepDirective, WizardResultComponent],
-  providers: [{ provide: WIZARD_STEP_SERVICE, useExisting: ExperimentDesignerService }],
+  providers: [EXPERIMENT_DESIGNER_WIZARD_PROVIDER],
   template: `
     <div class="ed-root">
 

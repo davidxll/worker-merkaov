@@ -8,6 +8,7 @@ import type {
   ContainmentId, ExcitationId, DetectorId, OutputFormatId,
 } from './experiment-designer.types.js';
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
+import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
 
 export interface ConfigChip {
   readonly label: string;
@@ -198,3 +199,8 @@ export class ExperimentDesignerService {
     this.compareOpenSig.set(false);
   }
 }
+
+export const EXPERIMENT_DESIGNER_WIZARD_PROVIDER = {
+  provide:     WIZARD_STEP_SERVICE,
+  useExisting: ExperimentDesignerService,
+};

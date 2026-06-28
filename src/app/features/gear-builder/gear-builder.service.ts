@@ -8,8 +8,6 @@ import type {
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
 import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
 
-export { WIZARD_STEPS };
-
 // ── Compare ──────────────────────────────────────────────────────────────────
 
 export type CompareTarget = 'structure' | 'drive';
@@ -35,34 +33,26 @@ export class GearBuilderService {
   private readonly compareOpenSig   = signal<boolean>(false);
   private readonly compareTargetSig = signal<CompareTarget>('structure');
 
-  public readonly currentStep  = this.stepSig.asReadonly();
-  public readonly build        = this.buildSig.asReadonly();
-  public readonly compareOpen  = this.compareOpenSig.asReadonly();
+  public readonly currentStep   = this.stepSig.asReadonly();
+  public readonly build         = this.buildSig.asReadonly();
+  public readonly compareOpen   = this.compareOpenSig.asReadonly();
   public readonly compareTarget = this.compareTargetSig.asReadonly();
+
+  // ── Selected options (one scan per option type per build change) ───────────
+
+  private readonly selectedStructure = computed(() => STRUCTURE_OPTIONS.find(o => o.id === this.buildSig().structure) ?? null);
+  private readonly selectedDrive     = computed(() => DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive) ?? null);
+  private readonly selectedFinish    = computed(() => FINISH_OPTIONS.find(o => o.id === this.buildSig().finish) ?? null);
+  private readonly selectedDetail    = computed(() => DETAIL_OPTIONS.find(o => o.id === this.buildSig().detail) ?? null);
+  private readonly selectedModule    = computed(() => MODULE_OPTIONS.find(o => o.id === this.buildSig().module) ?? null);
 
   // ── Derived state ──────────────────────────────────────────────────────────
 
-  public readonly structureStats = computed(() => {
-    const s = STRUCTURE_OPTIONS.find(o => o.id === this.buildSig().structure);
-    return s ? s.stats : null;
-  });
-
-  public readonly driveStats = computed(() => {
-    const d = DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive);
-    return d ? d.stats : null;
-  });
-
-  public readonly driveAccentColor = computed(() =>
-    DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive)?.accentColor ?? null
-  );
-
-  public readonly driveCycleType = computed(() =>
-    DRIVE_OPTIONS.find(o => o.id === this.buildSig().drive)?.cycleType ?? null
-  );
-
-  public readonly finishHex = computed(() =>
-    FINISH_OPTIONS.find(o => o.id === this.buildSig().finish)?.hex ?? null
-  );
+  public readonly structureStats   = computed(() => this.selectedStructure()?.stats ?? null);
+  public readonly driveStats       = computed(() => this.selectedDrive()?.stats ?? null);
+  public readonly driveAccentColor = computed(() => this.selectedDrive()?.accentColor ?? null);
+  public readonly driveCycleType   = computed(() => this.selectedDrive()?.cycleType ?? null);
+  public readonly finishHex        = computed(() => this.selectedFinish()?.hex ?? null);
 
   public readonly canAdvance = computed((): boolean => {
     const b = this.buildSig();
@@ -84,16 +74,13 @@ export class GearBuilderService {
     return !!(b.structure || b.drive || b.finish || b.detail || b.module);
   });
 
-  public readonly buildChips = computed((): BuildChip[] => {
-    const b = this.buildSig();
-    return [
-      { label: 'Structure', icon: 'fas fa-cube',         value: STRUCTURE_OPTIONS.find(o => o.id === b.structure)?.name ?? null },
-      { label: 'Drive',     icon: 'fas fa-bolt',          value: DRIVE_OPTIONS.find(o => o.id === b.drive)?.name ?? null         },
-      { label: 'Finish',    icon: 'fas fa-palette',       value: FINISH_OPTIONS.find(o => o.id === b.finish)?.name ?? null       },
-      { label: 'Detail',    icon: 'fas fa-vector-square', value: DETAIL_OPTIONS.find(o => o.id === b.detail)?.name ?? null       },
-      { label: 'Module',    icon: 'fas fa-plug',          value: MODULE_OPTIONS.find(o => o.id === b.module)?.name ?? null       },
-    ];
-  });
+  public readonly buildChips = computed((): BuildChip[] => [
+    { label: 'Structure', icon: 'fas fa-cube',         value: this.selectedStructure()?.name ?? null },
+    { label: 'Drive',     icon: 'fas fa-bolt',          value: this.selectedDrive()?.name ?? null     },
+    { label: 'Finish',    icon: 'fas fa-palette',       value: this.selectedFinish()?.name ?? null    },
+    { label: 'Detail',    icon: 'fas fa-vector-square', value: this.selectedDetail()?.name ?? null    },
+    { label: 'Module',    icon: 'fas fa-plug',          value: this.selectedModule()?.name ?? null    },
+  ]);
 
   public readonly compareTitle = computed((): string => {
     switch (this.compareTargetSig()) {
@@ -105,11 +92,11 @@ export class GearBuilderService {
 
   public readonly resultData = computed((): WizardResultData => {
     const b   = this.buildSig();
-    const str = STRUCTURE_OPTIONS.find(o => o.id === b.structure);
-    const drv = DRIVE_OPTIONS.find(o => o.id === b.drive);
-    const fin = FINISH_OPTIONS.find(o => o.id === b.finish);
-    const det = DETAIL_OPTIONS.find(o => o.id === b.detail);
-    const mod = MODULE_OPTIONS.find(o => o.id === b.module);
+    const str = this.selectedStructure();
+    const drv = this.selectedDrive();
+    const fin = this.selectedFinish();
+    const det = this.selectedDetail();
+    const mod = this.selectedModule();
     return {
       title: 'Your Object is Complete!',
       description: 'Configuration saved. Export as JSON or CSV to use this build downstream.',
