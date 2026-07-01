@@ -40,7 +40,7 @@ import { RouterLink } from '@angular/router';
         </h1>
 
         <p class="wl-desc">
-          Waltkerovoz is a reference-grade Angular 21 PWA — a living PrimeNG component
+          Waltkerovoz is a reference-grade Angular 21 PWA — a living hand-rolled component
           showcase and a suite of <strong>seven signal-powered wizards</strong>: from gear
           builders and element explorers to self-describing databases, Norse séances, and
           full project team planning — all forged inside the <strong>Crystalline Torque</strong>
@@ -543,7 +543,7 @@ import { RouterLink } from '@angular/router';
   `],
 })
 export class WelcomePage {
-  readonly techChips = ['Angular 21', 'TypeScript', 'PrimeNG', 'AG Grid', 'Signals', 'SCSS'];
+  readonly techChips = ['Angular 21', 'TypeScript', 'Krypton UI', 'AG Grid', 'Signals', 'SCSS'];
 
   readonly stats = [
     { value: '6',      label: 'Interactive Wizards' },

@@ -1,65 +1,65 @@
-import { Component, input, output } from '@angular/core';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
+import { Component, input, output, signal } from '@angular/core';
+import { AppDialogComponent } from '../ui/dialog.component.js';
+import { AppButtonComponent } from '../ui/button.component.js';
+import type { ButtonSeverity } from '../ui/button.component.js';
 
 @Component({
   selector: 'app-confirm-modal',
   standalone: true,
-  imports: [DialogModule, ButtonModule],
+  imports: [AppDialogComponent, AppButtonComponent],
   template: `
-    <p-dialog
+    <app-dialog
       [header]="header()"
       [(visible)]="visible"
       [modal]="true"
-      [style]="{ width: '420px' }"
-      [draggable]="false"
-      (onHide)="dismissed.emit()"
+      width="420px"
+      (hide)="dismissed.emit()"
     >
       <div class="flex items-start gap-4 py-2">
         <i [class]="iconClass() + ' text-2xl mt-0.5 shrink-0'"></i>
         <p class="text-slate-300 text-sm leading-relaxed m-0">{{ message() }}</p>
       </div>
-      <ng-template #footer>
-        <p-button
+      <ng-container dialogFooter>
+        <app-button
           [label]="cancelLabel()"
           [text]="true"
           severity="secondary"
-          (onClick)="onCancel()"
-        ></p-button>
-        <p-button
+          (clicked)="onCancel()"
+        ></app-button>
+        <app-button
           [label]="confirmLabel()"
           [icon]="confirmIcon()"
           [severity]="confirmSeverity()"
-          (onClick)="onConfirm()"
-        ></p-button>
-      </ng-template>
-    </p-dialog>
+          (clicked)="onConfirm()"
+        ></app-button>
+      </ng-container>
+    </app-dialog>
   `,
 })
 export class ConfirmModal {
-  header         = input('Confirm');
-  message        = input('Are you sure?');
-  confirmLabel   = input('Confirm');
-  cancelLabel    = input('Cancel');
-  confirmIcon    = input('fas fa-check');
-  confirmSeverity = input<'success' | 'danger' | 'warn' | 'info'>('danger');
-  iconClass      = input('fas fa-triangle-exclamation text-yellow-400');
+  header          = input('Confirm');
+  message         = input('Are you sure?');
+  confirmLabel    = input('Confirm');
+  cancelLabel     = input('Cancel');
+  confirmIcon     = input('fas fa-check');
+  confirmSeverity = input<ButtonSeverity>('danger');
+  iconClass       = input('fas fa-triangle-exclamation text-yellow-400');
 
-  visible = false;
+  visible = signal(false);
 
-  confirm = output<void>();
-  dismissed  = output<void>();
+  confirm   = output<void>();
+  dismissed = output<void>();
 
-  open()  { this.visible = true; }
-  close() { this.visible = false; }
+  open()  { this.visible.set(true); }
+  close() { this.visible.set(false); }
 
   onConfirm() {
-    this.visible = false;
+    this.visible.set(false);
     this.confirm.emit();
   }
 
   onCancel() {
-    this.visible = false;
+    this.visible.set(false);
     this.dismissed.emit();
   }
 }

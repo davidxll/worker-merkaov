@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════════════════════
 
    USAGE: Replace or @use this file instead of the Fluent v1 block in
-   src/styles.scss. All --f-* and --p-* tokens map 1-for-1 so no component
+   src/styles.scss. All --f-* tokens map 1-for-1 so no component
    changes are needed.
 
    PALETTE ORIGIN
@@ -136,70 +136,6 @@
   --f-subtitle:       var(--kr-subtitle);
   --f-title:          var(--kr-title);
   --f-title-lg:       var(--kr-title-lg);
-
-  /* ════════════════════════════════════════════════════════════════════
-     PRIMENG TOKEN MAP
-     ════════════════════════════════════════════════════════════════════ */
-  --p-primary-color:             var(--kr-primary);
-  --p-primary-hover-color:       var(--kr-primary-light);
-  --p-primary-active-color:      var(--kr-primary-dim);
-  --p-primary-color-text:        var(--kr-text-1);
-
-  --p-surface-0:    #D2E8F5;
-  --p-surface-50:   #B0CCDE;
-  --p-surface-100:  #7EAAC8;
-  --p-surface-200:  #4E82A0;
-  --p-surface-300:  #2E5878;
-  --p-surface-400:  #1E3A58;
-  --p-surface-500:  #162A44;
-  --p-surface-600:  #101C2E;   /* = --kr-layer-1 */
-  --p-surface-700:  #0C1422;
-  --p-surface-800:  #080E1A;   /* = --kr-layer-0 */
-  --p-surface-900:  #060A12;   /* = --kr-deep    */
-  --p-surface-950:  #03040A;   /* = --kr-void    */
-
-  --p-content-border-radius: var(--kr-radius);
-  --p-border-radius-sm:      var(--kr-radius-sm);
-  --p-border-radius:         var(--kr-radius);
-  --p-border-radius-lg:      var(--kr-radius-lg);
-  --p-border-radius-xl:      var(--kr-radius-xl);
-
-  --p-focus-ring-shadow:     0 0 0 2px var(--kr-primary), 0 0 8px rgba(126,200,227,0.4);
-
-  /* Card */
-  --p-card-background:     var(--kr-layer-1);
-  --p-card-border-color:   var(--kr-stroke);
-  --p-card-shadow:         var(--kr-shadow-4);
-  --p-card-color:          var(--kr-text-1);
-
-  /* Button */
-  --p-button-border-radius: var(--kr-radius);
-
-  /* Input */
-  --p-inputtext-background:          var(--kr-layer-2);
-  --p-inputtext-color:               var(--kr-text-1);
-  --p-inputtext-border-color:        var(--kr-stroke-sd);
-  --p-inputtext-hover-border-color:  var(--kr-primary);
-  --p-inputtext-border-radius:       var(--kr-radius);
-
-  /* Dialog */
-  --p-dialog-background:   var(--kr-layer-1);
-  --p-dialog-border-color: var(--kr-stroke-sd);
-  --p-dialog-border-radius: var(--kr-radius-xl);
-  --p-dialog-shadow:        var(--kr-shadow-16);
-  --p-dialog-header-color:  var(--kr-text-1);
-
-  /* Progress bar */
-  --p-progressbar-height:            3px;
-  --p-progressbar-border-radius:     2px;
-  --p-progressbar-background:        var(--kr-layer-3);
-  --p-progressbar-value-background:  var(--kr-primary);
-
-  /* Tag / Chip / Badge */
-  --p-tag-border-radius:   var(--kr-radius);
-  --p-chip-border-radius:  var(--kr-radius);
-  --p-chip-background:     var(--kr-layer-2);
-  --p-chip-color:          var(--kr-text-2);
 }
 
 /* ── BASE OVERRIDES ─────────────────────────────────────────────────────── */
@@ -296,53 +232,3 @@ code, pre, .mono { font-family: var(--kr-font-mono); }
   .ag-input-field-input              { background: var(--kr-layer-2) !important; color: var(--kr-text-1) !important; border-color: var(--kr-stroke-sd) !important; }
 }
 
-/* ── PRIMENG COMPONENT PATCHES ──────────────────────────────────────────── */
-
-.p-card {
-  background: var(--kr-layer-1) !important;
-  border: 1px solid var(--kr-stroke) !important;
-  border-radius: var(--kr-radius-lg) !important;
-  color: var(--kr-text-1) !important;
-  box-shadow: var(--kr-shadow-4) !important;
-  transition: border-color var(--kr-transition), box-shadow var(--kr-transition) !important;
-
-  &:hover {
-    border-color: var(--kr-stroke-sd) !important;
-    box-shadow: var(--kr-shadow-8), 0 0 16px rgba(126,200,227,0.12) !important;
-  }
-  .p-card-title   { color: var(--kr-text-1); font-weight: 500; letter-spacing: var(--kr-tracking); }
-  .p-card-content { color: var(--kr-text-2); font-size: 13px; }
-}
-
-.p-chip {
-  border-radius: var(--kr-radius) !important;
-  background: var(--kr-layer-2) !important;
-  color: var(--kr-text-2) !important;
-  border: 1px solid var(--kr-stroke) !important;
-  font-size: 12px !important;
-  letter-spacing: var(--kr-tracking) !important;
-}
-
-.p-progressbar {
-  border-radius: 2px !important;
-  height: 3px !important;
-  background: var(--kr-layer-3) !important;
-  .p-progressbar-value {
-    background: linear-gradient(90deg, var(--kr-primary-dim), var(--kr-primary-light)) !important;
-  }
-}
-
-.p-badge {
-  border-radius: var(--kr-radius) !important;
-  font-size: 10px !important;
-  letter-spacing: var(--kr-tracking) !important;
-}
-
-.p-tag {
-  border-radius: var(--kr-radius) !important;
-  font-size: 11px !important;
-  letter-spacing: var(--kr-tracking) !important;
-  background: var(--kr-primary-ghost) !important;
-  color: var(--kr-primary-light) !important;
-  border: 1px solid rgba(126,200,227,0.22) !important;
-}

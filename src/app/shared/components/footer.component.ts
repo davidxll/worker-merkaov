@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
     <footer class="page-footer">
       <div class="footer-divider"></div>
       <p class="footer-text">
-        Built with Angular 21 &middot; PrimeNG &middot; AG Grid &middot; Tailwind CSS &middot; FontAwesome
+        Built with Angular 21 &middot; Krypton UI &middot; AG Grid &middot; Tailwind CSS &middot; FontAwesome
       </p>
     </footer>
   `,

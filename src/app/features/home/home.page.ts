@@ -2,17 +2,11 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Title } from '@angular/platform-browser';
 import { CommonModule }      from '@angular/common';
 import { FormsModule }       from '@angular/forms';
-import { ButtonModule }      from 'primeng/button';
-import { CardModule }        from 'primeng/card';
-import { BadgeModule }       from 'primeng/badge';
-import { TagModule }         from 'primeng/tag';
-import { ChipModule }        from 'primeng/chip';
-import { InputTextModule }   from 'primeng/inputtext';
-import { DialogModule }      from 'primeng/dialog';
-import { ToastModule }       from 'primeng/toast';
-import { MessageService }    from 'primeng/api';
-import { AvatarModule }      from 'primeng/avatar';
-import { ProgressBarModule } from 'primeng/progressbar';
+import {
+  AppButtonComponent, AppCardComponent, AppTagComponent, AppChipComponent,
+  AppAvatarComponent, AppProgressBarComponent, AppDialogComponent,
+  ToastService, ToastHostComponent,
+} from '../../shared/ui/index.js';
 import { AgGridAngular }     from 'ag-grid-angular';
 import type { ColDef, GridOptions } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
@@ -28,16 +22,16 @@ ModuleRegistry.registerModules([AllCommunityModule]);
   selector: 'app-home',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [MessageService],
+  providers: [ToastService],
   imports: [
     CommonModule, FormsModule,
-    ButtonModule, CardModule, BadgeModule, TagModule, ChipModule,
-    InputTextModule, DialogModule, ToastModule, AvatarModule, ProgressBarModule,
+    AppButtonComponent, AppCardComponent, AppTagComponent, AppChipComponent,
+    AppAvatarComponent, AppProgressBarComponent, AppDialogComponent, ToastHostComponent,
     AgGridAngular,
     HeroComponent, FeatureCardsComponent, FooterComponent,
   ],
   template: `
-    <p-toast></p-toast>
+    <app-toast-host></app-toast-host>
 
     <app-hero></app-hero>
     <app-feature-cards></app-feature-cards>
@@ -45,41 +39,41 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     <!-- Buttons -->
     <section id="buttons" class="showcase-section alt-bg" aria-labelledby="h-buttons">
       <div class="showcase-header">
-        <h2 id="h-buttons"><i class="fas fa-hand-pointer mr-3 text-primary-500" aria-hidden="true"></i>PrimeNG Buttons</h2>
+        <h2 id="h-buttons"><i class="fas fa-hand-pointer mr-3 text-primary-500" aria-hidden="true"></i>Buttons</h2>
         <p>
-          <code class="code-tag">ButtonModule</code> provides severities, sizes, outlined,
-          text, icon-only, and loading states — all driven by the Aura design token system.
+          <code class="code-tag">AppButtonComponent</code> provides severities, sizes, outlined,
+          text, icon-only, and loading states — all driven by the Krypton design token system.
         </p>
       </div>
       <div class="demo-block">
         <p class="demo-label">Severities</p>
         <div class="flex flex-wrap gap-3">
-          <p-button label="Primary"></p-button>
-          <p-button label="Secondary" severity="secondary"></p-button>
-          <p-button label="Success"   severity="success"></p-button>
-          <p-button label="Warning"   severity="warn"></p-button>
-          <p-button label="Danger"    severity="danger"></p-button>
-          <p-button label="Info"      severity="info"></p-button>
+          <app-button label="Primary"></app-button>
+          <app-button label="Secondary" severity="secondary"></app-button>
+          <app-button label="Success"   severity="success"></app-button>
+          <app-button label="Warning"   severity="warn"></app-button>
+          <app-button label="Danger"    severity="danger"></app-button>
+          <app-button label="Info"      severity="info"></app-button>
         </div>
       </div>
       <div class="demo-block">
         <p class="demo-label">Styles</p>
         <div class="flex flex-wrap gap-3">
-          <p-button label="Outlined" [outlined]="true"></p-button>
-          <p-button label="Text"     [text]="true"></p-button>
-          <p-button label="Rounded"  [rounded]="true"></p-button>
-          <p-button label="Raised"   [raised]="true"></p-button>
+          <app-button label="Outlined" [outlined]="true"></app-button>
+          <app-button label="Text"     [text]="true"></app-button>
+          <app-button label="Rounded"  [rounded]="true"></app-button>
+          <app-button label="Raised"   [raised]="true"></app-button>
         </div>
       </div>
       <div class="demo-block">
         <p class="demo-label">With Icons</p>
         <div class="flex flex-wrap gap-3">
-          <p-button label="Save"    icon="fas fa-floppy-disk"></p-button>
-          <p-button label="Delete"  icon="fas fa-trash" severity="danger"></p-button>
-          <p-button icon="fas fa-heart" [rounded]="true" severity="danger" ariaLabel="Add to favourites"></p-button>
-          <p-button icon="fas fa-share-nodes" [rounded]="true" [outlined]="true" ariaLabel="Share"></p-button>
-          <p-button label="Loading" [loading]="loadingBtn"
-                    (onClick)="triggerLoading()" icon="fas fa-sync"></p-button>
+          <app-button label="Save"    icon="fas fa-floppy-disk"></app-button>
+          <app-button label="Delete"  icon="fas fa-trash" severity="danger"></app-button>
+          <app-button icon="fas fa-heart" [rounded]="true" severity="danger" ariaLabel="Add to favourites"></app-button>
+          <app-button icon="fas fa-share-nodes" [rounded]="true" [outlined]="true" ariaLabel="Share"></app-button>
+          <app-button label="Loading" [loading]="loadingBtn()"
+                    (clicked)="triggerLoading()" icon="fas fa-sync"></app-button>
         </div>
       </div>
     </section>
@@ -87,104 +81,98 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     <!-- Cards -->
     <section id="cards" class="showcase-section" aria-labelledby="h-cards">
       <div class="showcase-header">
-        <h2 id="h-cards"><i class="fas fa-id-card mr-3 text-primary-500" aria-hidden="true"></i>PrimeNG Cards</h2>
+        <h2 id="h-cards"><i class="fas fa-id-card mr-3 text-primary-500" aria-hidden="true"></i>Cards</h2>
         <p>
-          <code class="code-tag">CardModule</code> provides a flexible container with
+          <code class="code-tag">AppCardComponent</code> provides a flexible container with
           header, content, and footer zones. Ideal for dashboard widgets and summary panels.
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <p-card>
-          <ng-template #header>
-            <div class="card-media card-media--blue">
-              <i class="fas fa-chart-line text-4xl text-white opacity-80" aria-hidden="true"></i>
-            </div>
-          </ng-template>
-          <ng-template #title>Monthly Revenue</ng-template>
-          <ng-template #subtitle>Finance &middot; Q2 2026</ng-template>
-          <ng-template #content>
+        <app-card>
+          <div card-header class="card-media card-media--blue">
+            <i class="fas fa-chart-line text-4xl text-white opacity-80" aria-hidden="true"></i>
+          </div>
+          <div card-title>Monthly Revenue</div>
+          <div card-subtitle>Finance &middot; Q2 2026</div>
+          <div card-content>
             <p class="card-body-text">Total revenue increased 18% compared to last quarter, driven by enterprise subscriptions.</p>
             <div class="mt-4">
               <div class="flex justify-between card-caption-text mb-1"><span>Target</span><span>74%</span></div>
-              <p-progressbar [value]="74" [showValue]="false" styleClass="h-2"></p-progressbar>
+              <app-progress-bar [value]="74" [showValue]="false"></app-progress-bar>
             </div>
-          </ng-template>
-          <ng-template #footer>
-            <p-button label="View Report" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></p-button>
-          </ng-template>
-        </p-card>
+          </div>
+          <div card-footer>
+            <app-button label="View Report" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></app-button>
+          </div>
+        </app-card>
 
-        <p-card>
-          <ng-template #header>
-            <div class="card-media card-media--purple">
-              <i class="fas fa-users text-4xl text-white opacity-80" aria-hidden="true"></i>
-            </div>
-          </ng-template>
-          <ng-template #title>Active Users</ng-template>
-          <ng-template #subtitle>Platform &middot; Today</ng-template>
-          <ng-template #content>
+        <app-card>
+          <div card-header class="card-media card-media--purple">
+            <i class="fas fa-users text-4xl text-white opacity-80" aria-hidden="true"></i>
+          </div>
+          <div card-title>Active Users</div>
+          <div card-subtitle>Platform &middot; Today</div>
+          <div card-content>
             <p class="card-body-text">3,842 users active across web and mobile. Peak hour was 2 PM with 612 concurrent sessions.</p>
             <div class="flex items-center gap-2 mt-4">
-              <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-primary-600 text-white"></p-avatar>
-              <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-purple-600 text-white"></p-avatar>
-              <p-avatar icon="fas fa-user" shape="circle" styleClass="bg-emerald-600 text-white"></p-avatar>
+              <app-avatar icon="fas fa-user" shape="circle" styleClass="bg-primary-600 text-white"></app-avatar>
+              <app-avatar icon="fas fa-user" shape="circle" styleClass="bg-purple-600 text-white"></app-avatar>
+              <app-avatar icon="fas fa-user" shape="circle" styleClass="bg-emerald-600 text-white"></app-avatar>
               <span class="card-caption-text ml-1">+3,839 more</span>
             </div>
-          </ng-template>
-          <ng-template #footer>
-            <p-button label="Analytics" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></p-button>
-          </ng-template>
-        </p-card>
+          </div>
+          <div card-footer>
+            <app-button label="Analytics" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></app-button>
+          </div>
+        </app-card>
 
-        <p-card>
-          <ng-template #header>
-            <div class="card-media card-media--emerald">
-              <i class="fas fa-shield-halved text-4xl text-white opacity-80" aria-hidden="true"></i>
-            </div>
-          </ng-template>
-          <ng-template #title>System Health</ng-template>
-          <ng-template #subtitle>Infrastructure &middot; Live</ng-template>
-          <ng-template #content>
+        <app-card>
+          <div card-header class="card-media card-media--emerald">
+            <i class="fas fa-shield-halved text-4xl text-white opacity-80" aria-hidden="true"></i>
+          </div>
+          <div card-title>System Health</div>
+          <div card-subtitle>Infrastructure &middot; Live</div>
+          <div card-content>
             <p class="card-body-text">All services operational. Uptime at 99.97% over the last 30 days.</p>
             <div class="flex gap-2 mt-4 flex-wrap">
-              <p-tag value="API" severity="success"></p-tag>
-              <p-tag value="DB"  severity="success"></p-tag>
-              <p-tag value="CDN" severity="success"></p-tag>
-              <p-tag value="Auth" severity="success"></p-tag>
+              <app-tag value="API" severity="success"></app-tag>
+              <app-tag value="DB"  severity="success"></app-tag>
+              <app-tag value="CDN" severity="success"></app-tag>
+              <app-tag value="Auth" severity="success"></app-tag>
             </div>
-          </ng-template>
-          <ng-template #footer>
-            <p-button label="Status Page" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></p-button>
-          </ng-template>
-        </p-card>
+          </div>
+          <div card-footer>
+            <app-button label="Status Page" icon="fas fa-arrow-right" iconPos="right" [text]="true" size="small"></app-button>
+          </div>
+        </app-card>
       </div>
     </section>
 
     <!-- Inputs -->
     <section id="inputs" class="showcase-section alt-bg" aria-labelledby="h-inputs">
       <div class="showcase-header">
-        <h2 id="h-inputs"><i class="fas fa-keyboard mr-3 text-primary-500" aria-hidden="true"></i>PrimeNG Form Inputs</h2>
+        <h2 id="h-inputs"><i class="fas fa-keyboard mr-3 text-primary-500" aria-hidden="true"></i>Form Inputs</h2>
         <p>
-          <code class="code-tag">InputTextModule</code> plugs into Angular template-driven
+          The <code class="code-tag">.k-input</code> class plugs into Angular template-driven
           and reactive forms with live two-way binding.
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
         <div class="form-field">
           <label class="form-label" for="input-full-name">Full Name</label>
-          <input pInputText id="input-full-name" type="text" [(ngModel)]="formName" placeholder="Alice Martin" class="w-full" />
+          <input class="k-input w-full" id="input-full-name" type="text" [(ngModel)]="formName" placeholder="Alice Martin" />
         </div>
         <div class="form-field">
           <label class="form-label" for="input-email">Email Address</label>
-          <input pInputText id="input-email" type="email" [(ngModel)]="formEmail" placeholder="alice@example.com" class="w-full" />
+          <input class="k-input w-full" id="input-email" type="email" [(ngModel)]="formEmail" placeholder="alice@example.com" />
         </div>
         <div class="form-field">
           <label class="form-label" for="input-search">Search</label>
-          <input pInputText id="input-search" type="text" [(ngModel)]="formSearch" placeholder="Type to search..." class="w-full" />
+          <input class="k-input w-full" id="input-search" type="text" [(ngModel)]="formSearch" placeholder="Type to search..." />
         </div>
         <div class="form-field">
           <label class="form-label" for="input-api-key">API Key <span class="field-hint">(disabled)</span></label>
-          <input pInputText id="input-api-key" type="text" value="sk-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" [disabled]="true" class="w-full opacity-50" />
+          <input class="k-input w-full opacity-50" id="input-api-key" type="text" value="sk-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" [disabled]="true" />
         </div>
       </div>
       @if (formName) {
@@ -194,31 +182,30 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       }
     </section>
 
-    <!-- Tags / Badges / Chips -->
+    <!-- Tags / Chips -->
     <section id="tags" class="showcase-section" aria-labelledby="h-tags">
       <div class="showcase-header">
-        <h2 id="h-tags"><i class="fas fa-tags mr-3 text-primary-500" aria-hidden="true"></i>Tags, Badges &amp; Chips</h2>
+        <h2 id="h-tags"><i class="fas fa-tags mr-3 text-primary-500" aria-hidden="true"></i>Tags &amp; Chips</h2>
         <p>
-          <code class="code-tag">TagModule</code>, <code class="code-tag">BadgeModule</code>,
-          and <code class="code-tag">ChipModule</code> provide compact labelling primitives
-          for statuses, counts, and removable filter tokens.
+          <code class="code-tag">AppTagComponent</code> and <code class="code-tag">AppChipComponent</code>
+          provide compact labelling primitives for statuses and removable filter tokens.
         </p>
       </div>
       <div class="demo-block">
         <p class="demo-label">Tags</p>
         <div class="flex flex-wrap gap-3">
-          <p-tag value="New Feature" severity="info"    icon="fas fa-star"></p-tag>
-          <p-tag value="In Progress" severity="warn"    icon="fas fa-hourglass-half"></p-tag>
-          <p-tag value="Completed"   severity="success" icon="fas fa-check"></p-tag>
-          <p-tag value="Blocked"     severity="danger"  icon="fas fa-ban"></p-tag>
-          <p-tag value="Draft"                          icon="fas fa-pencil"></p-tag>
+          <app-tag value="New Feature" severity="info"    icon="fas fa-star"></app-tag>
+          <app-tag value="In Progress" severity="warn"    icon="fas fa-hourglass-half"></app-tag>
+          <app-tag value="Completed"   severity="success" icon="fas fa-check"></app-tag>
+          <app-tag value="Blocked"     severity="danger"  icon="fas fa-ban"></app-tag>
+          <app-tag value="Draft"                          icon="fas fa-pencil"></app-tag>
         </div>
       </div>
       <div class="demo-block">
         <p class="demo-label">Chips — click X to remove</p>
         <div class="flex flex-wrap gap-3">
           @for (chip of activeChips(); track chip) {
-            <p-chip [label]="chip" [removable]="true" (onRemove)="removeChip(chip)"></p-chip>
+            <app-chip [label]="chip" [removable]="true" (remove)="removeChip(chip)"></app-chip>
           }
           @if (activeChips().length === 0) {
             <span style="font-size:13px;color:var(--f-text-3);font-style:italic;">All chips removed.</span>
@@ -252,42 +239,40 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     <!-- Dialog -->
     <section id="dialog" class="showcase-section" aria-labelledby="h-dialog">
       <div class="showcase-header">
-        <h2 id="h-dialog"><i class="fas fa-window-maximize mr-3 text-primary-500" aria-hidden="true"></i>PrimeNG Dialog</h2>
+        <h2 id="h-dialog"><i class="fas fa-window-maximize mr-3 text-primary-500" aria-hidden="true"></i>Dialogs</h2>
         <p>
-          <code class="code-tag">DialogModule</code> renders modal overlays with customisable
-          headers, footers, and animation. Supports dragging and maximisation.
+          <code class="code-tag">AppDialogComponent</code> renders modal overlays with customisable
+          headers and footers, closing on backdrop click or Escape.
         </p>
       </div>
       <div class="flex flex-wrap gap-4">
-        <p-button label="Basic Dialog"   icon="fas fa-message"             (onClick)="showDialog('basic')"></p-button>
-        <p-button label="Confirm Dialog" icon="fas fa-triangle-exclamation" severity="warn" (onClick)="showDialog('confirm')"></p-button>
+        <app-button label="Basic Dialog"   icon="fas fa-message"             (clicked)="showDialog('basic')"></app-button>
+        <app-button label="Confirm Dialog" icon="fas fa-triangle-exclamation" severity="warn" (clicked)="showDialog('confirm')"></app-button>
       </div>
 
-      <p-dialog header="Welcome to Waltkerovoz" [(visible)]="dialogBasic"
-                [modal]="true" [draggable]="true" [style]="{ width: '480px' }">
+      <app-dialog header="Welcome to Waltkerovoz" [(visible)]="dialogBasic" [modal]="true" width="480px">
         <p class="dialog-text">
-          This is a PrimeNG dialog. It supports rich content, form controls, and custom footers.
-          Drag it by the header bar or press Escape to close.
+          This is a hand-rolled dialog. It supports rich content, form controls, and custom footers.
+          Press Escape or click the backdrop to close.
         </p>
-        <ng-template #footer>
-          <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="dialogBasic = false"></p-button>
-          <p-button label="Got it!" icon="fas fa-check" (onClick)="dialogBasic = false"></p-button>
-        </ng-template>
-      </p-dialog>
+        <ng-container dialogFooter>
+          <app-button label="Cancel" [text]="true" severity="secondary" (clicked)="dialogBasic.set(false)"></app-button>
+          <app-button label="Got it!" icon="fas fa-check" (clicked)="dialogBasic.set(false)"></app-button>
+        </ng-container>
+      </app-dialog>
 
-      <p-dialog header="Confirm Action" [(visible)]="dialogConfirm"
-                [modal]="true" [style]="{ width: '400px' }">
+      <app-dialog header="Confirm Action" [(visible)]="dialogConfirm" [modal]="true" width="400px">
         <div class="flex items-start gap-4">
           <i class="fas fa-triangle-exclamation shrink-0" style="color:var(--kr-warning);font-size:22px;margin-top:2px;" aria-hidden="true"></i>
           <p class="dialog-text">
             This action cannot be undone. Are you sure you want to permanently delete this record?
           </p>
         </div>
-        <ng-template #footer>
-          <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="dialogConfirm = false"></p-button>
-          <p-button label="Delete" icon="fas fa-trash" severity="danger" (onClick)="onConfirmDelete()"></p-button>
-        </ng-template>
-      </p-dialog>
+        <ng-container dialogFooter>
+          <app-button label="Cancel" [text]="true" severity="secondary" (clicked)="dialogConfirm.set(false)"></app-button>
+          <app-button label="Delete" icon="fas fa-trash" severity="danger" (clicked)="onConfirmDelete()"></app-button>
+        </ng-container>
+      </app-dialog>
     </section>
 
     <!-- FontAwesome Icons -->
@@ -349,14 +334,29 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     /* ── Forms ── */
     .form-field { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 13px; font-weight: 400; color: var(--f-text-2); }
+    .k-input {
+      display: block;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: var(--kr-radius);
+      background: var(--kr-layer-2);
+      color: var(--kr-text-1);
+      border: 1px solid var(--kr-stroke-sd);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 150ms var(--f-ease);
+      &:hover:not(:disabled)  { border-color: var(--kr-primary); }
+      &:focus                 { outline: none; border-color: var(--kr-primary); box-shadow: var(--kr-primary-glow); }
+      &::placeholder          { color: var(--f-text-3); }
+      &:disabled              { cursor: not-allowed; }
+    }
 
-    /* ── Cards (PrimeNG p-card media headers) ── */
+    /* ── Cards (media headers) ── */
     .card-media {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 120px;
-      border-radius: 8px 8px 0 0;
     }
     .card-media--blue   {
       background: var(--f-layer-0);
@@ -409,7 +409,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 })
 export class HomePage {
   private readonly svc     = inject(AppService);
-  private readonly msgSvc  = inject(MessageService);
+  private readonly toastSvc = inject(ToastService);
 
   constructor() {
     inject(Title).setTitle('Home — Waltkerovoz');
@@ -417,11 +417,11 @@ export class HomePage {
   }
 
   protected employees   = signal<Employee[]>([]);
-  protected activeChips = signal(['Angular 21', 'PrimeNG', 'AG Grid', 'Tailwind', 'FontAwesome']);
+  protected activeChips = signal(['Angular 21', 'Krypton UI', 'AG Grid', 'Tailwind', 'FontAwesome']);
 
-  protected loadingBtn:    boolean = false;
-  protected dialogBasic:   boolean = false;
-  protected dialogConfirm: boolean = false;
+  protected loadingBtn    = signal(false);
+  protected dialogBasic   = signal(false);
+  protected dialogConfirm = signal(false);
   protected formName:      string  = '';
   protected formEmail:     string  = '';
   protected formSearch:    string  = '';
@@ -478,8 +478,8 @@ export class HomePage {
   }
 
   protected triggerLoading(): void {
-    this.loadingBtn = true;
-    setTimeout(() => (this.loadingBtn = false), 1800);
+    this.loadingBtn.set(true);
+    setTimeout(() => this.loadingBtn.set(false), 1800);
   }
 
   protected removeChip(chip: string): void {
@@ -487,12 +487,12 @@ export class HomePage {
   }
 
   protected showDialog(type: 'basic' | 'confirm'): void {
-    if (type === 'basic')   this.dialogBasic   = true;
-    if (type === 'confirm') this.dialogConfirm = true;
+    if (type === 'basic')   this.dialogBasic.set(true);
+    if (type === 'confirm') this.dialogConfirm.set(true);
   }
 
   protected onConfirmDelete(): void {
-    this.dialogConfirm = false;
-    this.msgSvc.add({ severity: 'success', summary: 'Done', detail: 'Record deleted (demo).' });
+    this.dialogConfirm.set(false);
+    this.toastSvc.add({ severity: 'success', summary: 'Done', detail: 'Record deleted (demo).' });
   }
 }

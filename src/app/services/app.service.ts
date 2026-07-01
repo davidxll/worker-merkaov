@@ -42,10 +42,10 @@ export class AppService {
         badge: 'v21',
       },
       {
-        title: 'PrimeNG',
-        description: 'A rich set of UI components including buttons, cards, dialogs, inputs, and tables styled with the Aura theme.',
+        title: 'Krypton UI',
+        description: 'A hand-rolled set of buttons, cards, dialogs, and inputs built directly on the Crystalline Torque design tokens.',
         icon: 'fas fa-layer-group',
-        badge: 'v21',
+        badge: 'in-house',
       },
       {
         title: 'AG Grid',

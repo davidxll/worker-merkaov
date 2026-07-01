@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Krypton theme — all --kr-* tokens, --f-* aliases, PrimeNG + AG Grid patches ── */
+/* ── Krypton theme — all --kr-* tokens, --f-* aliases, AG Grid patches ── */
 @import './krypton-theme';
 
 /* ── WCAG AA override — raises hint/placeholder text contrast above style-guide default ── */
