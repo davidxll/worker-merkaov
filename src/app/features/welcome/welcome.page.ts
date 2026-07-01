@@ -17,6 +17,9 @@ import { RouterLink } from '@angular/router';
         <a routerLink="/app/gear-builder">Object Builder</a>
         <a routerLink="/app/experiment-designer">Experiment Designer</a>
         <a routerLink="/app/element-explorer">Element Explorer</a>
+        <a routerLink="/app/db-wizard">DB Wizard</a>
+        <a routerLink="/app/seances">Séances</a>
+        <a routerLink="/app/team-builder">Team Builder</a>
       </div>
       <a class="wl-launch-btn" routerLink="/app">
         Launch app <i class="fas fa-arrow-right"></i>
@@ -38,9 +41,10 @@ import { RouterLink } from '@angular/router';
 
         <p class="wl-desc">
           Waltkerovoz is a reference-grade Angular 21 PWA — a living PrimeNG component
-          showcase <strong>and</strong> a fully-built generic object builder — forged inside
-          the <strong>Crystalline Torque</strong> design system. One theme file. Every
-          component re-skinned in noble-gas light.
+          showcase and a suite of <strong>seven signal-powered wizards</strong>: from gear
+          builders and element explorers to self-describing databases, Norse séances, and
+          full project team planning — all forged inside the <strong>Crystalline Torque</strong>
+          design system. One theme file. Every component re-skinned in noble-gas light.
         </p>
 
         <div class="wl-actions">
@@ -85,19 +89,33 @@ import { RouterLink } from '@angular/router';
       }
     </section>
 
-    <!-- ── Object Builder showcase ── -->
-    <section class="wl-showcase">
-      <div class="wl-showcase-eyebrow">
-        <span class="wl-eyebrow-dot"></span> THE FLAGSHIP FLOW
+    <!-- ── Wizard Gallery ── -->
+    <section class="wl-gallery">
+      <div class="wl-gallery-header">
+        <div class="wl-showcase-eyebrow">
+          <span class="wl-eyebrow-dot"></span> SIX WIZARD EXPERIENCES
+        </div>
+        <h2 class="wl-showcase-title">Pick Your Journey</h2>
+        <p class="wl-showcase-desc">
+          Every wizard shares the same signal-driven architecture and Krypton design tokens.
+          Each delivers a completely different domain — from configuring production databases
+          to summoning Norse gods.
+        </p>
       </div>
-      <h2 class="wl-showcase-title">The Object Builder</h2>
-      <p class="wl-showcase-desc">
-        Configure any abstract object in three interlocking moves — Structure, Drive, Finish.
-        Every choice renders into a live geometric schematic, assembled in real time.
-      </p>
-      <a class="wl-btn-primary wl-showcase-cta" routerLink="/app/gear-builder">
-        Open Object Builder <i class="fas fa-arrow-right"></i>
-      </a>
+      <div class="wl-wizard-grid">
+        @for (wiz of wizards; track wiz.route) {
+          <a class="wl-wizard-card" [routerLink]="wiz.route">
+            <div class="wl-wizard-icon" [style.background]="wiz.color + '18'" [style.color]="wiz.color">
+              <i [class]="wiz.icon + ' text-xl'"></i>
+            </div>
+            <div class="wl-wizard-info">
+              <span class="wl-wizard-name">{{ wiz.name }}</span>
+              <span class="wl-wizard-sub">{{ wiz.sub }}</span>
+            </div>
+            <i class="fas fa-arrow-right wl-wizard-arrow" [style.color]="wiz.color"></i>
+          </a>
+        }
+      </div>
     </section>
 
     <!-- ── Footer ── -->
@@ -389,16 +407,20 @@ import { RouterLink } from '@angular/router';
       margin: 0;
     }
 
-    /* ── Gear Builder showcase ── */
-    .wl-showcase {
+    /* ── Wizard Gallery ── */
+    .wl-gallery {
+      padding: 80px 40px;
+      background: var(--f-layer-0);
+      border-top: 1px solid var(--f-stroke);
+      border-bottom: 1px solid var(--f-stroke);
+      @media (max-width: 767px) { padding: 48px 16px; }
+    }
+    .wl-gallery-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 96px 40px;
-      background: var(--f-layer-0);
-      border-top: 1px solid var(--f-stroke);
-      border-bottom: 1px solid var(--f-stroke);
+      margin-bottom: 48px;
     }
     .wl-showcase-eyebrow {
       display: inline-flex;
@@ -411,7 +433,7 @@ import { RouterLink } from '@angular/router';
       margin-bottom: 20px;
     }
     .wl-showcase-title {
-      font-size: clamp(32px, 5vw, 52px);
+      font-size: clamp(28px, 4vw, 44px);
       font-weight: 700;
       color: var(--f-text-1);
       margin: 0 0 16px;
@@ -422,11 +444,70 @@ import { RouterLink } from '@angular/router';
       color: var(--f-text-2);
       line-height: 1.7;
       max-width: 560px;
-      margin: 0 0 36px;
+      margin: 0;
     }
-    @media (max-width: 767px)                         { .wl-showcase { padding: 48px 20px; } }
-    @media (min-width: 768px) and (max-width: 1023px) { .wl-showcase { padding: 64px 32px; } }
-    .wl-showcase-cta { font-size: 15px; padding: 0 28px; height: 44px; }
+    .wl-wizard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 10px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .wl-wizard-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: 8px;
+      background: var(--f-layer-1);
+      border: 1px solid var(--f-stroke);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 150ms, border-color 150ms, box-shadow 150ms;
+      &:hover {
+        background: var(--f-layer-2);
+        border-color: var(--f-stroke-sd);
+        box-shadow: var(--f-shadow-2);
+        .wl-wizard-arrow { opacity: 1; transform: translateX(3px); }
+      }
+    }
+    .wl-wizard-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .wl-wizard-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+    .wl-wizard-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--f-text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .wl-wizard-sub {
+      font-size: 12px;
+      color: var(--f-text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .wl-wizard-arrow {
+      font-size: 13px;
+      opacity: 0.35;
+      flex-shrink: 0;
+      transition: opacity 150ms, transform 150ms;
+    }
 
     /* ── Footer ── */
     .wl-footer {
@@ -465,10 +546,20 @@ export class WelcomePage {
   readonly techChips = ['Angular 21', 'TypeScript', 'PrimeNG', 'AG Grid', 'Signals', 'SCSS'];
 
   readonly stats = [
-    { value: '8',      label: 'Component Families' },
-    { value: '2,000+', label: 'FontAwesome Icons'  },
-    { value: '3',      label: 'Step Object Builder' },
-    { value: '1',      label: 'SCSS Theme File'    },
+    { value: '6',      label: 'Interactive Wizards' },
+    { value: '2,000+', label: 'FontAwesome Icons'   },
+    { value: '3',      label: 'Steps per Wizard'    },
+    { value: '1',      label: 'SCSS Theme File'     },
+  ];
+
+  readonly wizards = [
+    { name: 'Object Builder',       sub: '3-step gear configurator with live SVG',     icon: 'fas fa-cube',                   color: '#3a8fc8', route: '/app/gear-builder'        },
+    { name: 'Experiment Designer',  sub: 'Lab apparatus wizard & protocol export',      icon: 'fas fa-flask',                  color: '#8b5cf6', route: '/app/experiment-designer' },
+    { name: 'Element Explorer',     sub: 'Build a live 118-element periodic table',     icon: 'fas fa-atom',                   color: '#10b981', route: '/app/element-explorer'    },
+    { name: 'MLS Composer',         sub: 'Real-estate listing & market search wizard',  icon: 'fas fa-magnifying-glass-location', color: '#f59e0b', route: '/app/mls-composer'     },
+    { name: 'DB Wizard',            sub: 'Self-describing database config builder',     icon: 'fas fa-database',               color: '#06b6d4', route: '/app/db-wizard'           },
+    { name: 'Séances → Valhalla',   sub: 'Norse mythology ritual passage manifest',     icon: 'fas fa-fire-flame-curved',      color: '#ff6b1a', route: '/app/seances'            },
+    { name: 'Team Builder',         sub: 'Plan a project, staff it, save the config',   icon: 'fas fa-diagram-project',        color: '#ef4444', route: '/app/team-builder'       },
   ];
 
   readonly features = [

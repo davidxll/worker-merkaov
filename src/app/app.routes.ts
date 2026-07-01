@@ -42,6 +42,26 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dream-space/dream-space.page').then(m => m.DreamSpacePage),
       },
+      {
+        path: 'my-workflow',
+        loadComponent: () =>
+          import('./features/my-workflow/my-workflow.page').then(m => m.MyWorkflowPage),
+      },
+      {
+        path: 'db-wizard',
+        loadComponent: () =>
+          import('./features/db-wizard/db-wizard.page').then(m => m.DbWizardPage),
+      },
+      {
+        path: 'seances',
+        loadComponent: () =>
+          import('./features/seances/seances.page').then(m => m.SeancesPage),
+      },
+      {
+        path: 'team-builder',
+        loadComponent: () =>
+          import('./features/team-builder/team-builder.page').then(m => m.TeamBuilderPage),
+      },
     ],
   },
   { path: '', redirectTo: 'welcome', pathMatch: 'full' },

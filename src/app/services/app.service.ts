@@ -13,6 +13,10 @@ export class AppService {
       { label: 'Object Builder',       icon: 'fas fa-cube',   route: '/app/gear-builder'            },
       { label: 'MLS Composer',         icon: 'fas fa-magnifying-glass-location', route: '/app/mls-composer' },
       { label: 'Dream Space',          icon: 'fas fa-wand-magic-sparkles',       route: '/app/dream-space'  },
+      { label: 'My Workflow',          icon: 'fas fa-palette',                   route: '/app/my-workflow'  },
+      { label: 'DB Wizard',            icon: 'fas fa-database',                  route: '/app/db-wizard'    },
+      { label: 'Séances',              icon: 'fas fa-fire-flame-curved',         route: '/app/seances'      },
+      { label: 'Team Builder',         icon: 'fas fa-diagram-project',           route: '/app/team-builder' },
     ]);
   }
 
