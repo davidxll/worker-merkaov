@@ -7,6 +7,7 @@ import type {
 } from './dream-space.types.js';
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
 import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import { createWizardNav } from '../../shared/wizard-nav.js';
 
 export interface SpaceChip {
   readonly label: string;
@@ -143,21 +144,17 @@ export class DreamSpaceService {
     return false;
   }
 
-  public nextStep(): void {
-    if (this.stepSig() < WIZARD_STEPS.length && this.canAdvance()) {
-      this.stepSig.update(s => s + 1);
-    }
-  }
+  private readonly nav = createWizardNav({
+    stepSig:         this.stepSig,
+    totalSteps:      WIZARD_STEPS.length,
+    isStepReachable: n => this.isStepReachable(n),
+    canAdvance:      () => this.canAdvance(),
+  });
 
-  public prevStep(): void {
-    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
-  }
-
-  public jumpToStep(n: number): void {
-    if (this.isStepReachable(n)) this.stepSig.set(n);
-  }
-
-  public finish(): void { this.stepSig.set(5); }
+  public nextStep(): void   { this.nav.nextStep(); }
+  public prevStep(): void   { this.nav.prevStep(); }
+  public jumpToStep(n: number): void { this.nav.jumpToStep(n); }
+  public finish(): void     { this.nav.finish(); }
 
   public reset(): void {
     this.dreamSig.set({ realm: null, form: null, impossible: null, atmosphere: null });

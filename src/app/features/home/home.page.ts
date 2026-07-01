@@ -15,6 +15,8 @@ import type { Employee } from '../../models/models';
 import { HeroComponent } from '../../shared/components/hero.component';
 import { FeatureCardsComponent } from '../../shared/components/feature-cards.component';
 import { FooterComponent } from '../../shared/components/footer.component';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { DragDropModule, moveItemInArray, type CdkDragDrop } from '@angular/cdk/drag-drop';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -29,6 +31,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     AppAvatarComponent, AppProgressBarComponent, AppDialogComponent, ToastHostComponent,
     AgGridAngular,
     HeroComponent, FeatureCardsComponent, FooterComponent,
+    ClipboardModule, DragDropModule,
   ],
   template: `
     <app-toast-host></app-toast-host>
@@ -294,6 +297,45 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       </div>
     </section>
 
+    <!-- Angular CDK -->
+    <section id="cdk" class="showcase-section alt-bg" aria-labelledby="h-cdk">
+      <div class="showcase-header">
+        <h2 id="h-cdk"><i class="fas fa-layer-group mr-3 text-primary-500" aria-hidden="true"></i>Angular CDK</h2>
+        <p>
+          <code class="code-tag">&#64;angular/cdk</code> primitives — no styling opinions, just behaviour.
+          Clipboard copy and drag-and-drop reordering, wired up directly.
+        </p>
+      </div>
+
+      <div class="demo-block">
+        <p class="demo-label">Clipboard — click a box to copy its text</p>
+        <div class="flex flex-wrap gap-3">
+          @for (snippet of clipSnippets; track snippet) {
+            <button
+              type="button"
+              class="clip-box"
+              [cdkCopyToClipboard]="snippet"
+              (cdkCopyToClipboardCopied)="onCopied($event, snippet)">
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <code>{{ snippet }}</code>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="demo-block">
+        <p class="demo-label">Drag &amp; Drop — reorder the list</p>
+        <div class="drag-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+          @for (item of dragItems(); track item) {
+            <div class="drag-item" cdkDrag>
+              <i class="fas fa-grip-lines drag-handle" aria-hidden="true"></i>
+              <span>{{ item }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
     <app-footer></app-footer>
   `,
   styles: [`
@@ -395,6 +437,49 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       &:hover { background: var(--f-layer-2); border-color: var(--f-stroke-sd); }
     }
 
+    /* ── CDK: Clipboard ── */
+    .clip-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      background: var(--f-layer-1);
+      border: 1px solid var(--f-stroke);
+      color: var(--f-text-2);
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 150ms var(--f-ease), border-color 150ms var(--f-ease), color 150ms var(--f-ease);
+      i { color: var(--f-accent-light); }
+      &:hover { background: var(--f-layer-2); border-color: var(--f-stroke-sd); color: var(--f-text-1); }
+    }
+
+    /* ── CDK: Drag & Drop ── */
+    .drag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 420px;
+    }
+    .drag-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 4px;
+      background: var(--f-layer-1);
+      border: 1px solid var(--f-stroke);
+      color: var(--f-text-1);
+      font-size: 14px;
+      cursor: grab;
+      transition: background 150ms var(--f-ease);
+      &:hover { background: var(--f-layer-2); }
+      &.cdk-drag-preview { box-shadow: var(--f-shadow-8); }
+      &.cdk-drag-placeholder { opacity: 0.3; }
+    }
+    .drag-handle { color: var(--f-text-3); }
+
     /* ── Inline code ── */
     .code-tag {
       font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
@@ -494,5 +579,27 @@ export class HomePage {
   protected onConfirmDelete(): void {
     this.dialogConfirm.set(false);
     this.toastSvc.add({ severity: 'success', summary: 'Done', detail: 'Record deleted (demo).' });
+  }
+
+  protected readonly clipSnippets: string[] = [
+    'npm install @angular/cdk',
+    'ng add @angular/cdk',
+    'cdkCopyToClipboard',
+  ];
+
+  protected dragItems = signal(['Chassis', 'Engine', 'Wheels', 'Paint']);
+
+  protected onCopied(success: boolean, snippet: string): void {
+    this.toastSvc.add(success
+      ? { severity: 'success', summary: 'Copied', detail: `"${snippet}" copied to clipboard.` }
+      : { severity: 'danger',  summary: 'Copy failed', detail: 'Clipboard access was denied.' });
+  }
+
+  protected onDrop(event: CdkDragDrop<string[]>): void {
+    this.dragItems.update(items => {
+      const next = [...items];
+      moveItemInArray(next, event.previousIndex, event.currentIndex);
+      return next;
+    });
   }
 }

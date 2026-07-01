@@ -9,6 +9,7 @@ import type {
 } from './experiment-designer.types.js';
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
 import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import { createWizardNav } from '../../shared/wizard-nav.js';
 
 export interface ConfigChip {
   readonly label: string;
@@ -135,14 +136,6 @@ export class ExperimentDesignerService {
 
   // ── Navigation ──────────────────────────────────────────────────────────────
 
-  public nextStep(): void {
-    if (this.stepSig() < this.totalSteps) this.stepSig.update(s => s + 1);
-  }
-
-  public prevStep(): void {
-    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
-  }
-
   public isStepReachable(n: number): boolean {
     const c = this.configSig();
     return (
@@ -152,13 +145,17 @@ export class ExperimentDesignerService {
     );
   }
 
-  public jumpToStep(n: number): void {
-    if (this.isStepReachable(n)) this.stepSig.set(n);
-  }
+  private readonly nav = createWizardNav({
+    stepSig:         this.stepSig,
+    totalSteps:      this.totalSteps,
+    isStepReachable: n => this.isStepReachable(n),
+    canFinish:       () => this.canFinish(),
+  });
 
-  public finish(): void {
-    if (this.canFinish()) this.stepSig.set(this.totalSteps + 1);
-  }
+  public nextStep(): void   { this.nav.nextStep(); }
+  public prevStep(): void   { this.nav.prevStep(); }
+  public jumpToStep(n: number): void { this.nav.jumpToStep(n); }
+  public finish(): void     { this.nav.finish(); }
 
   public reset(): void {
     this.configSig.set(EMPTY_CONFIG);

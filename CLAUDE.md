@@ -48,6 +48,12 @@ Two distinct layouts coexist under a bare `<router-outlet>` in `AppComponent`:
 /app/gear-builder         → AppShellComponent > GearBuilderPage
 /app/experiment-designer  → AppShellComponent > ExperimentDesignerPage
 /app/element-explorer     → AppShellComponent > ElementExplorerPage
+/app/mls-composer         → AppShellComponent > MlsComposerPage
+/app/dream-space          → AppShellComponent > DreamSpacePage
+/app/my-workflow          → AppShellComponent > MyWorkflowPage
+/app/db-wizard            → AppShellComponent > DbWizardPage
+/app/seances              → AppShellComponent > SeancesPage
+/app/team-builder         → AppShellComponent > TeamBuilderPage
 **               → redirect → /welcome
 ```
 
@@ -68,9 +74,15 @@ AppComponent (app.ts)          ← bare <router-outlet> only
                   ├─ NavComponent  (layout/nav.component.ts)
                   └─ <router-outlet>
                        ├─ /app/home                → HomePage
-                       ├─ /app/gear-builder        → GearBuilderPage
-                       ├─ /app/experiment-designer → ExperimentDesignerPage
-                       └─ /app/element-explorer    → ElementExplorerPage
+                       ├─ /app/gear-builder        → GearBuilderPage (wizard)
+                       ├─ /app/experiment-designer → ExperimentDesignerPage (wizard)
+                       ├─ /app/element-explorer    → ElementExplorerPage (wizard)
+                       ├─ /app/mls-composer        → MlsComposerPage (wizard)
+                       ├─ /app/dream-space         → DreamSpacePage (wizard)
+                       ├─ /app/my-workflow         → MyWorkflowPage (wizard)
+                       ├─ /app/db-wizard           → DbWizardPage (wizard)
+                       ├─ /app/seances             → SeancesPage (wizard)
+                       └─ /app/team-builder        → TeamBuilderPage (wizard)
 ```
 
 `LayoutService` (`services/layout.service.ts`) is the single source of truth for sidebar collapsed/mobileOpen state. Inject it in any component that needs to read or mutate layout.
@@ -95,11 +107,11 @@ Full-width marketing landing page for the project. Has its own sticky top nav (n
 
 ### Feature: Home page (`features/home/home.page.ts`)
 
-The Home page is a **component showcase**, not a product feature. It renders `HeroComponent`, `FeatureCardsComponent`, and then inline sections demonstrating PrimeNG buttons, cards, tags, chips, inputs, dialogs, avatars, progress bars, and an AG Grid employee table. All data (nav items, employees, feature cards) comes from `AppService`, which returns static in-memory mocks via `of(...)` — there is no backend.
+The Home page is a **component showcase**, not a product feature. It renders `HeroComponent`, `FeatureCardsComponent`, and then inline sections demonstrating Krypton UI components (buttons, cards, tags, chips, avatars, progress bars, dialogs) and an AG Grid employee table. All data (nav items, employees, feature cards) comes from `AppService`, which returns static in-memory mocks via `of(...)` — there is no backend.
 
 ### Shared: Wizard-step directive (`shared/wizard-step.directive.ts`)
 
-All three wizard features (`GearBuilderPage`, `ExperimentDesignerPage`, `ElementExplorerPage`) share a single `wizardStep` directive. It depends on `WIZARD_STEP_SERVICE` — an `InjectionToken<IWizardStepService>` — which each page provides via `providers: [{ provide: WIZARD_STEP_SERVICE, useExisting: <FeatureService> }]`. The directive exposes `isActive`, `isDone`, `isReachable`, `label`, `icon`, and `sublabel` as computed signals; step sections reference it via `#ref="wizardStep"`.
+All nine wizard features share a single `wizardStep` directive. It depends on `WIZARD_STEP_SERVICE` — an `InjectionToken<IWizardStepService>` — which each service provides via `providers: [{ provide: WIZARD_STEP_SERVICE, useExisting: <FeatureService> }]`. The directive exposes `isActive`, `isDone`, `isReachable`, `label`, `icon`, and `sublabel` as computed signals; step sections reference it via `#ref="wizardStep"`.
 
 `IWizardStepService` requires two members: `currentStep: Signal<number>` and `isStepReachable(n: number): boolean`. All three feature services satisfy this interface.
 
@@ -171,23 +183,21 @@ Wizard UI with a sticky HUD, full-width step sections, compare modals, and a com
 
 ### Styling
 
-**Active theme: `src/styles.scss`** — the Crystalline Torque / Krypton design system, applied globally. Defines:
+**Active theme: `src/styles.scss`** — the Crystalline Torque / Krypton design system, applied globally. Imports `src/krypton-theme.scss` and defines:
 - `--f-*` token namespace: `--f-accent`, `--f-layer-0..3`, `--f-text-1..3`, `--f-stroke`, `--f-shadow-*`, `--f-acrylic-bg`, `--f-acrylic-blur`, `--f-ease`, etc.
-- PrimeNG Aura dark token overrides (`--p-*`)
 - AG Grid Krypton overrides (`.ag-theme-alpine`)
-- PrimeNG component patches (`.p-card`, `.p-chip`, `.p-progressbar`, `.p-tag`)
 
-**Reference: `src/krypton-theme.scss`** — the canonical `--kr-*` token definitions with full design commentary. Not imported into the build; exists as the authoritative design reference. All `--kr-*` values in this file are the source of truth for colours, spacing, and typography.
+**Reference & Active: `src/krypton-theme.scss`** — the canonical `--kr-*` token definitions with full design commentary. **Imported into the build** via `@use './krypton-theme'` in `styles.scss`. All `--kr-*` values in this file are the source of truth for colours, spacing, and typography.
 
 All component styles use `--f-*` tokens exclusively — never raw colours. The acrylic pattern (`background: var(--f-acrylic-bg)` + `backdrop-filter: blur(var(--f-acrylic-blur))`) is used by the sticky nav and mobile topbar.
 
 **Tailwind CSS** is used with `@apply` inside component `styles` blocks. The `tailwind.config.js` `primary` palette stops at shade 900 — there is no `primary-950` Tailwind class.
 
-**PrimeNG v21** (Aura theme, forced dark — `darkModeSelector: 'none'`). PrimeNG overlays/modals are avoided in favour of `@if`-driven fixed overlays to sidestep unpredictable PrimeNG API behaviour.
+**Krypton UI** — hand-rolled component library in `src/app/shared/ui/` (button, card, chip, dialog, avatar, progress-bar, tag, toast). Replaces PrimeNG entirely. All components follow the standalone + OnPush pattern and use `--f-*` tokens.
 
 **AG Grid v36** — `AllCommunityModule` registered once in `home.page.ts` via `ModuleRegistry.registerModules`. AG Grid is themed via CSS variable overrides in `styles.scss` under `.ag-theme-alpine`.
 
-> **Theming pitfalls:** AG Grid v36 changed several internal class names from earlier versions — always verify against the v36 API when adding or fixing grid styles. PrimeNG injects its CSS variables at runtime (not build time); if a PrimeNG component appears unstyled, check that the `--p-*` variable overrides in `styles.scss` are present and that `darkModeSelector: 'none'` is still set in `providePrimeNG`. After any styling change, visually verify **both light and dark** rendering.
+> **Theming pitfalls:** AG Grid v36 changed several internal class names from earlier versions — always verify against the v36 API when adding or fixing grid styles. After any styling change, visually verify **both light and dark** rendering.
 
 Component style budget is raised to `16 kB` warning / `64 kB` error in `angular.json` to accommodate large page-level style blocks.
 

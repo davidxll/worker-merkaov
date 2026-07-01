@@ -33,6 +33,7 @@ export type LayoutStyle  = 'classic' | 'compact' | 'wide' | 'alpha';
 export type ColorScheme  = 'category' | 'state' | 'block' | 'period' | 'mono';
 export type DetailLevel  = 'symbol' | 'standard' | 'full';
 export type FilterMode   = 'all' | 'metals' | 'nonmetals' | 'noble' | 'radioactive';
+export type ViewMode     = 'grid' | 'data';
 
 export interface TableConfig {
   layout:      LayoutStyle | null;

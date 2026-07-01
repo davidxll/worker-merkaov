@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, HostListener, inject, OnInit,
+  ChangeDetectionStrategy, Component, HostListener, inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
@@ -744,8 +744,9 @@ import type { StructureId, DriveId, FinishId, DetailId, ModuleId } from './gear-
     .cmp-select-btn--active { border-color: var(--kr-primary); color: var(--kr-primary); background: rgba(58,143,200,0.1); }
   `],
 })
-export class GearBuilderPage implements OnInit {
+export class GearBuilderPage {
   protected readonly gb = inject(GearBuilderService);
+  constructor() { inject(Title).setTitle('Object Builder — Waltkerovoz'); }
 
   protected readonly steps      = WIZARD_STEPS;
   protected readonly structures = STRUCTURE_OPTIONS;
@@ -753,12 +754,6 @@ export class GearBuilderPage implements OnInit {
   protected readonly finishes   = FINISH_OPTIONS;
   protected readonly details    = DETAIL_OPTIONS;
   protected readonly modules    = MODULE_OPTIONS;
-
-  constructor(private readonly title: Title) {}
-
-  ngOnInit(): void {
-    this.title.setTitle('Object Builder — Waltkerovoz');
-  }
 
   protected structureName(id: StructureId): string {
     return STRUCTURE_OPTIONS.find(s => s.id === id)?.name ?? id;

@@ -4,9 +4,10 @@ import {
   CATEGORY_COLORS, STATE_COLORS, BLOCK_COLORS, PERIOD_COLORS,
 } from './element-explorer.mock.js';
 import type {
-  ChemElement, TableConfig, LayoutStyle, ColorScheme, DetailLevel, FilterMode, WizardStep,
+  ChemElement, TableConfig, LayoutStyle, ColorScheme, DetailLevel, FilterMode, ViewMode, WizardStep,
 } from './element-explorer.types.js';
 import { WIZARD_STEP_SERVICE } from '../../shared/wizard-step.directive.js';
+import { createWizardNav } from '../../shared/wizard-nav.js';
 import type { WizardResultData } from '../../shared/wizard-result.types.js';
 
 export { WIZARD_STEPS };
@@ -32,12 +33,14 @@ export class ElementExplorerService {
   private readonly stepSig            = signal<number>(1);
   private readonly configSig          = signal<TableConfig>(EMPTY_CONFIG);
   private readonly selectedElementSig = signal<ChemElement | null>(null);
+  private readonly viewModeSig        = signal<ViewMode>('grid');
 
   // ── Public read-only signals ────────────────────────────────────────────────
 
   public readonly currentStep     = this.stepSig.asReadonly();
   public readonly config          = this.configSig.asReadonly();
   public readonly selectedElement = this.selectedElementSig.asReadonly();
+  public readonly viewMode        = this.viewModeSig.asReadonly();
   public readonly totalSteps      = WIZARD_STEPS.length;
   public readonly allElements     = ELEMENTS;
   public readonly isComplete      = computed(() => this.stepSig() > this.totalSteps);
@@ -127,26 +130,27 @@ export class ElementExplorerService {
     );
   }
 
-  public nextStep(): void {
-    if (this.stepSig() < this.totalSteps) this.stepSig.update(s => s + 1);
-  }
+  private readonly nav = createWizardNav({
+    stepSig:         this.stepSig,
+    totalSteps:      this.totalSteps,
+    isStepReachable: n => this.isStepReachable(n),
+    canFinish:       () => this.canFinish(),
+  });
 
-  public prevStep(): void {
-    if (this.stepSig() > 1) this.stepSig.update(s => s - 1);
-  }
-
-  public jumpToStep(n: number): void {
-    if (this.isStepReachable(n)) this.stepSig.set(n);
-  }
-
-  public finish(): void {
-    if (this.canFinish()) this.stepSig.set(this.totalSteps + 1);
-  }
+  public nextStep(): void   { this.nav.nextStep(); }
+  public prevStep(): void   { this.nav.prevStep(); }
+  public jumpToStep(n: number): void { this.nav.jumpToStep(n); }
+  public finish(): void     { this.nav.finish(); }
 
   public reset(): void {
     this.configSig.set(EMPTY_CONFIG);
     this.stepSig.set(1);
     this.selectedElementSig.set(null);
+    this.viewModeSig.set('grid');
+  }
+
+  public setViewMode(mode: ViewMode): void {
+    this.viewModeSig.set(mode);
   }
 
   // ── Selections ──────────────────────────────────────────────────────────────

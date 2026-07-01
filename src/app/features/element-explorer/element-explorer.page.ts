@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { WizardStepDirective } from '../../shared/wizard-step.directive.js';
@@ -287,16 +287,16 @@ import { WizardResultComponent } from '../../shared/components/wizard-result.com
             <div class="view-toggle" role="group" aria-label="View mode">
               <button
                 class="vt-btn"
-                [class.vt-btn--active]="viewMode() === 'grid'"
-                (click)="viewMode.set('grid')"
+                [class.vt-btn--active]="svc.viewMode() === 'grid'"
+                (click)="svc.setViewMode('grid')"
                 title="Periodic Table">
                 <i class="fas fa-table-cells" aria-hidden="true"></i>
                 Table
               </button>
               <button
                 class="vt-btn"
-                [class.vt-btn--active]="viewMode() === 'data'"
-                (click)="viewMode.set('data')"
+                [class.vt-btn--active]="svc.viewMode() === 'data'"
+                (click)="svc.setViewMode('data')"
                 title="Data Grid">
                 <i class="fas fa-database" aria-hidden="true"></i>
                 Data
@@ -305,7 +305,7 @@ import { WizardResultComponent } from '../../shared/components/wizard-result.com
           </div>
 
         <!-- Data grid view -->
-        @if (viewMode() === 'data') {
+        @if (svc.viewMode() === 'data') {
           <div class="data-view">
             <app-element-table />
           </div>
@@ -315,7 +315,7 @@ import { WizardResultComponent } from '../../shared/components/wizard-result.com
         <div class="table-scroll"
              [class.layout-compact]="svc.config().layout === 'compact'"
              [class.layout-wide]="svc.config().layout === 'wide'"
-             [style.display]="viewMode() === 'data' ? 'none' : null">
+             [style.display]="svc.viewMode() === 'data' ? 'none' : null">
 
           @if (svc.config().layout !== 'alpha') {
             <!-- Classic / Compact / Wide grid layout -->
@@ -438,7 +438,7 @@ import { WizardResultComponent } from '../../shared/components/wizard-result.com
 
         </div><!-- /table-stage -->
 
-        <button resultActions class="btn-reset" (click)="svc.reset(); viewMode.set('grid')" type="button">
+        <button resultActions class="btn-reset" (click)="svc.reset()" type="button">
           <i class="fas fa-rotate-left" aria-hidden="true"></i>
           Build Another
         </button>
@@ -1083,7 +1083,6 @@ import { WizardResultComponent } from '../../shared/components/wizard-result.com
 export class ElementExplorerPage {
   protected readonly svc = inject(ElementExplorerService);
   constructor() { inject(Title).setTitle('Element Explorer — Waltkerovoz'); }
-  protected readonly viewMode = signal<'grid' | 'data'>('grid');
 
   protected readonly WIZARD_STEPS = WIZARD_STEPS;
   protected readonly LAYOUT_OPTIONS = LAYOUT_OPTIONS;
