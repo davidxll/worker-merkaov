@@ -1,9 +1,9 @@
+/* ── Krypton theme — all --kr-* tokens, --f-* aliases, AG Grid patches ── */
+@use './krypton-theme';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* ── Krypton theme — all --kr-* tokens, --f-* aliases, AG Grid patches ── */
-@import './krypton-theme';
 
 /* ── WCAG AA override — raises hint/placeholder text contrast above style-guide default ── */
 :root {
